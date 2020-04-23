@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Library\KmjUser\Entity;
+namespace Kematjaya\User\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Library\KmjUser\Repo;
+namespace Kematjaya\User\Repo;
 
-use App\Library\KmjUser\Entity\KmjUserInterface;
+use Kematjaya\User\Entity\KmjUserInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>

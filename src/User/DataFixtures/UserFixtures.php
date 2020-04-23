@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Library\KmjUser\DataFixtures;
+namespace Kematjaya\User\DataFixtures;
 
-use App\Library\KmjUser\Entity\KmjUserInterface;
-use App\Library\KmjUser\Repo\KmjUserRepoInterface;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Kematjaya\User\Entity\KmjUserInterface;
+use Kematjaya\User\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class UserFixtures extends Fixture 
+class UserFixtures extends Fixture implements FixtureGroupInterface
 {
     private $kmjUserRepo;
     
@@ -49,4 +50,10 @@ class UserFixtures extends Fixture
 
         $manager->flush();
     }
+
+    public static function getGroups(): array 
+    {
+        return ['kmj-user'];
+    }
+
 }
