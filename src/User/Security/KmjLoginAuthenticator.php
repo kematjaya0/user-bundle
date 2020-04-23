@@ -18,6 +18,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
@@ -25,26 +26,34 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
 
     public const LOGIN_ROUTE = 'app_login';
 
+    private $config;
     private $kmjUserRepo;
     private $urlGenerator;
     private $csrfTokenManager;
     private $passwordEncoder;
+    private $loginRoute;
+    private $authSuccessRoute;
 
     public function __construct(
+            ContainerInterface $container,
             KmjUserRepoInterface $kmjUserRepo, 
             UrlGeneratorInterface $urlGenerator, 
             CsrfTokenManagerInterface $csrfTokenManager, 
             UserPasswordEncoderInterface $passwordEncoder)
     {
+        $this->config = $container->getParameter('kmj_user');
         $this->kmjUserRepo = $kmjUserRepo;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
+        
+        $this->loginRoute = (isset($this->config['route']['login']) and strlen($this->config['route']['login'])>0) ? $this->config['route']['login'] : self::LOGIN_ROUTE;
+        $this->authSuccessRoute = (isset($this->config['route']['auth_success']) and strlen($this->config['route']['auth_success'])>0) ? $this->config['route']['auth_success'] : 'dashboard_index';
     }
 
     public function supports(Request $request)
     {
-        return self::LOGIN_ROUTE === $request->attributes->get('_route')
+        return $this->loginRoute === $request->attributes->get('_route')
             && $request->isMethod('POST');
     }
 
@@ -95,7 +104,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $this->saveTargetPath($request->getSession(), $providerKey, $this->urlGenerator->generate("dashboard_index"));
+        $this->saveTargetPath($request->getSession(), $providerKey, $this->urlGenerator->generate($this->authSuccessRoute));
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
@@ -106,6 +115,6 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
 
     protected function getLoginUrl()
     {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        return $this->urlGenerator->generate($this->loginRoute);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Kematjaya\User\DependencyInjection;
 
+use Kematjaya\User\DependencyInjection\Configuration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -16,5 +17,10 @@ class KmjUserExtension extends Extension
         $loader = new XmlFileLoader($container,
             new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
+        //$loader->load('routing.xml');
+        $configuration = new Configuration();
+
+        $config = $this->processConfiguration($configuration, $configs);
+        $container->setParameter('kmj_user', $config);
     }
 }
