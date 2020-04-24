@@ -1,1 +1,190 @@
 # user-bundle for symfony 5 4 or higher
+1. Install
+   ```
+   composer require kematjaya/user-bundle
+   ```
+2. Enable Bundle
+   add to config/bundles.php
+   ```
+   Kematjaya\User\KmjUserBundle::class => ['all' => true]
+   ```
+3. create file config/packages/kmj_user.yml
+   ```
+   kmj_user:
+    route:
+        login: kmj_user_login
+        auth_success: path if login success
+   ```
+4. create entity src/Entity/MyUser.php
+   ```
+   <?php
+
+    namespace App\Entity;
+
+    use Doctrine\ORM\Mapping as ORM;
+    use Kematjaya\User\Entity\KmjUserInterface;
+
+    /**
+     * @ORM\Entity(repositoryClass="App\Repository\MyUserRepository")
+     */
+    class MyUser implements KmjUserInterface
+    {
+        /**
+         * @ORM\Id()
+         * @ORM\GeneratedValue()
+         * @ORM\Column(type="integer")
+         */
+        private $id;
+
+        /**
+         * @ORM\Column(type="string", length=180, unique=true)
+         */
+        private $username;
+
+        /**
+         * @ORM\Column(type="json")
+         */
+        private $roles = [];
+
+        /**
+         * @var string The hashed password
+         * @ORM\Column(type="string")
+         */
+        private $password;
+
+        /**
+         * @ORM\Column(type="string", length=255)
+         */
+        private $name;
+
+        /**
+         * @ORM\Column(type="boolean")
+         */
+        private $is_active;
+
+        const ROLE_OPERATOR = "ROLE_OPERATOR";
+        const ROLE_KEPALA = "ROLE_KEPALA";
+
+        public function getId(): ?int
+        {
+            return $this->id;
+        }
+
+        /**
+         * A visual identifier that represents this user.
+         *
+         * @see UserInterface
+         */
+        public function getUsername(): string
+        {
+            return (string) $this->username;
+        }
+
+        public function setUsername(string $username): self
+        {
+            $this->username = $username;
+
+            return $this;
+        }
+
+        /**
+         * @see UserInterface
+         */
+        public function getRoles(): array
+        {
+            $roles = $this->roles;
+            // guarantee every user at least has ROLE_USER
+            $roles[] = self::ROLE_USER;
+
+            return array_unique($roles);
+        }
+
+        public function setRoles(array $roles): self
+        {
+            $this->roles = $roles;
+
+            return $this;
+        }
+
+        /**
+         * @see UserInterface
+         */
+        public function getPassword(): string
+        {
+            return (string) $this->password;
+        }
+
+        public function setPassword(string $password): self
+        {
+            $this->password = $password;
+
+            return $this;
+        }
+
+        /**
+         * @see UserInterface
+         */
+        public function getSalt()
+        {
+            // not needed when using the "bcrypt" algorithm in security.yaml
+        }
+
+        /**
+         * @see UserInterface
+         */
+        public function eraseCredentials()
+        {
+            // If you store any temporary, sensitive data on the user, clear it here
+            // $this->plainPassword = null;
+        }
+
+        public function getName(): ?string
+        {
+            return $this->name;
+        }
+
+        public function setName(string $name): KmjUserInterface
+        {
+            $this->name = $name;
+
+            return $this;
+        }
+
+        public function getIsActive(): ?bool
+        {
+            return $this->is_active;
+        }
+
+        public function setIsActive(bool $is_active): KmjUserInterface
+        {
+            $this->is_active = $is_active;
+
+            return $this;
+        }
+    }
+
+   ```
+5. update config/packages/security.yml
+   ```
+   security:
+       role_hierarchy:
+           # kmj_user default rule is (ROLE_SUPER_USER, ROLE_ADMINISTRATOR, ROLE_USER)
+           ROLE_ADMINISTRATOR: ROLE_USER
+           ROLE_SUPER_USER: ROLE_ADMINISTRATOR
+       encoders:
+           App\Entity\MyUser:
+              algorithm: auto
+       providers:
+           app_user_provider:
+               entity:
+                   class: App\Entity\MyUser
+                    property: username
+       firewalls:
+           main:
+               logout: 
+                   path: kmj_user_logout
+               guard:
+                   authenticators:
+                       - Kematjaya\User\Security\KmjLoginAuthenticator
+   ```
+6. import route, update file 
