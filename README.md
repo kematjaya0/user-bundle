@@ -207,6 +207,19 @@
 8. add Repo to Service, config/services.yml
    ```
    services:
+       ....
        kematjaya.user_repo:
            class: App\Repository\MyUserRepository
    ```
+9. for using data dummy for user, use fixture on config/services.yml (optional)
+   ```
+   services:
+       ....
+       UserFixtures:
+           class: Kematjaya\User\DataFixtures\UserFixtures
+   ```
+   then run on command :
+   ```
+   php bin/console doctrine:fixtures:load
+   ```
+   
