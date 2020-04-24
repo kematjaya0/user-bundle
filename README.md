@@ -62,9 +62,6 @@
          */
         private $is_active;
 
-        const ROLE_OPERATOR = "ROLE_OPERATOR";
-        const ROLE_KEPALA = "ROLE_KEPALA";
-
         public function getId(): ?int
         {
             return $this->id;
@@ -187,4 +184,29 @@
                    authenticators:
                        - Kematjaya\User\Security\KmjLoginAuthenticator
    ```
-6. import route, update file 
+6. import route, update file config/routes/annotations.yaml
+   ```
+   kmj_user:
+    resource: '@KmjUserBundle/Resources/config/routing/all.xml'
+   ```
+7. update user repo, src/Repository/MyUserRepository.php
+   ```
+   use App\Entity\MyUser;
+   use Kematjaya\User\Entity\KmjUserInterface;
+   use Kematjaya\User\Repo\KmjUserRepoInterface;
+   ...
+   class MyUserRepository extends ServiceEntityRepository implements KmjUserRepoInterface
+   {
+       ....
+       public function createUser(): KmjUserInterface 
+       {
+            return new MyUser();
+       }  
+   }
+   ```
+8. add Repo to Service, config/services.yml
+   ```
+   services:
+       kematjaya.user_repo:
+           class: App\Repository\MyUserRepository
+   ```
