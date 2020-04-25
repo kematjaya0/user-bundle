@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <defaults public="false" />
-        <service id="Kematjaya\User\Repo\KmjUserRepoInterface" alias="kematjaya.user_repo" />
+        <service id="Kematjaya\User\Repo\KmjUserRepoInterface" alias="kematjaya.user_repo" public="true"/>
         <service id="Kematjaya\User\DataFixtures\UserFixtures" class="Kematjaya\User\DataFixtures\UserFixtures">
             <argument type="service" id="kematjaya.user_repo" />
             <argument type="service" id="security.encoder_factory.generic" />
@@ -18,17 +18,20 @@
         </service>
         <service id="Kematjaya\User\Controller\KmjSecurityController" class="Kematjaya\User\Controller\KmjSecurityController" public="true">
             <argument type="service" id="security.authentication_utils" />
+            <argument type="service" id="kematjaya.user_repo" />
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>
         </service>
+        <service id="Kematjaya\User\Form\ChangePasswordType" class="Kematjaya\User\Form\ChangePasswordType">
+            <argument type="service" id="security.encoder_factory.generic" />
+            <argument type="service" id="security.user_password_encoder.generic" />
+            <tag name="form.type"/>
+        </service>
         <!--<service id="Kematjaya\Currency\DataTransformer\PriceDataTransformer" class="Kematjaya\Currency\DataTransformer\PriceDataTransformer">
             <argument type="service" id="Kematjaya\Currency\Lib\CurrencyFormat" />
         </service>
-        <service id="Kematjaya\Currency\Type\PriceType" class="Kematjaya\Currency\Type\PriceType">
-            <argument type="service" id="Kematjaya\Currency\DataTransformer\PriceDataTransformer" />
-            <tag name="form.type"/>
-        </service>
+        
         <service id="Kematjaya\Currency\Twig\PriceExtension" class="Kematjaya\Currency\Twig\PriceExtension">
             <argument type="service" id="Kematjaya\Currency\Lib\CurrencyFormat" />
             <tag name="twig.extension"/>

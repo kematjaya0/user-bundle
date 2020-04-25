@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ title|trans }}: {{ kmj_user.username }} {% endblock %}
+
+{% block body %}
+    
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>{{ 'username'|trans }}</th>
+                <td>{{ kmj_user.username }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'name'|trans }}</th>
+                <td>{{ kmj_user.name }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'roles'|trans }}</th>
+                <td>{{ kmj_user.roles ? kmj_user.roles|json_encode : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+                
+{% endblock %}
