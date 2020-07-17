@@ -1,4 +1,4 @@
-# user-bundle for symfony 5 4 or higher
+# user-bundle for symfony 4 or symfony 5
 1. Install
    ```
    composer require kematjaya/user-bundle
@@ -222,4 +222,10 @@
    ```
    php bin/console doctrine:fixtures:load
    ```
-   
+   then, use root and admin for login and password: admin123
+10. other route :
+   ```
+   {{ path('kmj_user_profile') }} // for profile user
+   {{ path('kmj_user_change_password') }} // for open change password form
+   {{ path('kmj_user_logout') }} // for logout 
+   ```
