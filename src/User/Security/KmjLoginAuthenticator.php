@@ -18,13 +18,13 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
+    public const LOGIN_ROUTE = 'kmj_user_login';
 
     private $config;
     private $kmjUserRepo;
@@ -35,26 +35,25 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
     private $authSuccessRoute;
 
     public function __construct(
-            ContainerInterface $container,
+            ContainerBagInterface $containerBag,
             KmjUserRepoInterface $kmjUserRepo, 
             UrlGeneratorInterface $urlGenerator, 
             CsrfTokenManagerInterface $csrfTokenManager, 
             UserPasswordEncoderInterface $passwordEncoder)
     {
-        $this->config = $container->getParameter('kmj_user');
+        $this->config = $containerBag->get('kmj_user');
         $this->kmjUserRepo = $kmjUserRepo;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
-        
-        $this->loginRoute = (isset($this->config['route']['login']) and strlen($this->config['route']['login'])>0) ? $this->config['route']['login'] : self::LOGIN_ROUTE;
-        $this->authSuccessRoute = (isset($this->config['route']['auth_success']) and strlen($this->config['route']['auth_success'])>0) ? $this->config['route']['auth_success'] : 'dashboard_index';
+        $this->loginRoute = $this->config['route']['login'];
+        $this->authSuccessRoute = $this->config['route']['auth_success'];
     }
 
     public function supports(Request $request)
     {
         return $this->loginRoute === $request->attributes->get('_route')
-            && $request->isMethod('POST');
+            && $request->isMethod(Request::METHOD_POST);
     }
 
     public function getCredentials(Request $request)

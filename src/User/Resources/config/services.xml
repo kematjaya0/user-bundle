@@ -10,7 +10,7 @@
             <argument type="service" id="security.encoder_factory.generic" />
         </service>
         <service id="Kematjaya\User\Security\KmjLoginAuthenticator" class="Kematjaya\User\Security\KmjLoginAuthenticator">
-            <argument type="service" id="service_container" />
+            <argument type="service" id="parameter_bag" />
             <argument type="service" id="kematjaya.user_repo" />
             <argument type="service" id="router.default" />
             <argument type="service" id="security.csrf.token_manager" />

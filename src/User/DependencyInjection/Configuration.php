@@ -9,16 +9,19 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface 
 {
-    //put your code here
     public function getConfigTreeBuilder(): TreeBuilder 
     {
         $treeBuilder = new TreeBuilder('kmj_user');
-        $treeBuilder->getRootNode()
+        $rootNode = $treeBuilder->getRootNode();
+        
+        $rootNode
+                //->fixXmlConfig('path')
                 ->children()
                     ->arrayNode('route')
+                        ->addDefaultsIfNotSet()
                         ->children()
-                            ->scalarNode('login')->end()
-                            ->scalarNode('auth_success')->end()
+                            ->scalarNode('login')->defaultValue('kmj_user_login')->end()
+                            ->scalarNode('auth_success')->defaultValue('homepage')->end()
                         ->end()
                     ->end()
                 ->end();

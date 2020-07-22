@@ -38,21 +38,19 @@ class ChangePasswordType extends AbstractType
     {
         $builder
             ->add('username', null, [
-                "attr" => ["readonly" => true, "class" => "form-control"]
+                "label" => "username",
+                "attr" => ["readonly" => true]
             ])
             ->add('password_old', PasswordType::class, [
-                "required" => true, "label" => "Password Lama", 
-                "attr" => ["class" => "form-control"]
+                "required" => true, "label" => "old_password",
             ])
             ->add('password_new', PasswordType::class, [
                 "required" => true, 
-                "label" => "Password Baru",
-                "attr" => ["class" => "form-control"]
+                "label" => "password_new"
             ])
             ->add('password_re_new', PasswordType::class, [
                 "required" => true, 
-                "label" => "Ulangi Password Baru",
-                "attr" => ["class" => "form-control"]
+                "label" => "password_re_new"
             ]);
         
         
