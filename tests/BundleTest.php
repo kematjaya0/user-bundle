@@ -1,8 +1,8 @@
 <?php
 
-namespace Kematjaya\Tests\ItemPack;
+namespace Kematjaya\UserBundle\Tests;
 
-use Kematjaya\Tests\User\AppKernel;
+use Kematjaya\UserBundle\Tests\AppKernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
@@ -13,7 +13,7 @@ class BundleTest extends WebTestCase
     {
         $client = static::createClient();
         $container = $client->getContainer();
-        dump($container->has('Kematjaya\User\DataFixtures\UserFixtures'));exit;
+        dump($container);exit;
         // Test if the service exists
         //$this->assertTrue($container->has('kematjaya.breadcrumbs_builder'));
         //$this->assertTrue($container->has('kematjaya.breadcrumbs_extension'));

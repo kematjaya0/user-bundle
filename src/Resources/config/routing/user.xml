@@ -3,16 +3,16 @@
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <route id="kmj_user_login" path="/login" methods="GET POST">
-        <default key="_controller">Kematjaya\User\Controller\KmjSecurityController::login</default>
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::login</default>
     </route>
     <route id="kmj_user_logout" path="/logout" methods="GET">
-        <default key="_controller">Kematjaya\User\Controller\KmjSecurityController::logout</default>
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::logout</default>
     </route>
     <route id="kmj_user_profile" path="/profile" methods="GET">
-        <default key="_controller">Kematjaya\User\Controller\KmjSecurityController::profile</default>
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::profile</default>
     </route>
     <route id="kmj_user_change_password" path="/change-password" methods="GET POST">
-        <default key="_controller">Kematjaya\User\Controller\KmjSecurityController::changePassword</default>
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::changePassword</default>
     </route>
     
 </routes>

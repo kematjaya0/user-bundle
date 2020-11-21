@@ -6,9 +6,9 @@
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 
-namespace Kematjaya\User\Form;
+namespace Kematjaya\UserBundle\Form;
 
-use Kematjaya\User\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kematjaya\Tests\User;
+namespace Kematjaya\UserBundle\Tests;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -13,7 +13,7 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         return [
-            new \Kematjaya\User\KmjUserBundle(),
+            new \Kematjaya\UserBundle\UserBundle(),
             new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
             new \Symfony\Bundle\FrameworkBundle\FrameworkBundle()
         ];

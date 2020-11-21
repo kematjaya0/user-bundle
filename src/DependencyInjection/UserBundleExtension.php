@@ -1,8 +1,8 @@
 <?php
 
-namespace Kematjaya\User\DependencyInjection;
+namespace Kematjaya\UserBundle\DependencyInjection;
 
-use Kematjaya\User\DependencyInjection\Configuration;
+use Kematjaya\UserBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class KmjUserExtension extends Extension 
+class UserBundleExtension extends Extension 
 {
     public function load(array $configs, ContainerBuilder $container) 
     {

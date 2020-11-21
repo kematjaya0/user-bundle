@@ -1,9 +1,9 @@
 <?php
 
-namespace Kematjaya\User\Controller;
+namespace Kematjaya\UserBundle\Controller;
 
-use Kematjaya\User\Form\ChangePasswordType;
-use Kematjaya\User\Repo\KmjUserRepoInterface;
+use Kematjaya\UserBundle\Form\ChangePasswordType;
+use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

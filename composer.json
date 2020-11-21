@@ -26,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Kematjaya\\": "src/"
+            "Kematjaya\\UserBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Kematjaya\\Tests\\": "tests/"
+            "Kematjaya\\UserBundle\\Tests\\": "tests/"
         }
     }
 }

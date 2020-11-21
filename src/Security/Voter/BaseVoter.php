@@ -1,8 +1,8 @@
 <?php
 
-namespace Kematjaya\User\Security\Voter;
+namespace Kematjaya\UserBundle\Security\Voter;
 
-use Kematjaya\User\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

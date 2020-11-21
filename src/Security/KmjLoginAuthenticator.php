@@ -1,8 +1,8 @@
 <?php
 
-namespace Kematjaya\User\Security;
+namespace Kematjaya\UserBundle\Security;
 
-use Kematjaya\User\Repo\KmjUserRepoInterface;
+use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

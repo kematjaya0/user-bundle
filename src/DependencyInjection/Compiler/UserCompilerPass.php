@@ -1,6 +1,6 @@
 <?php
 
-namespace Kematjaya\User\DependencyInjection\Compiler;
+namespace Kematjaya\UserBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

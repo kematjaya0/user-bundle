@@ -1,10 +1,10 @@
 <?php
 
-namespace Kematjaya\User\DataFixtures;
+namespace Kematjaya\UserBundle\DataFixtures;
 
+use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Kematjaya\User\Entity\KmjUserInterface;
-use Kematjaya\User\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;

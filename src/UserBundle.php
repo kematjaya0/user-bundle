@@ -1,15 +1,15 @@
 <?php
 
-namespace Kematjaya\User;
+namespace Kematjaya\UserBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Kematjaya\User\DependencyInjection\Compiler\UserCompilerPass;
+use Kematjaya\UserBundle\DependencyInjection\Compiler\UserCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class KmjUserBundle extends Bundle 
+class UserBundle extends Bundle 
 {
     public function build(ContainerBuilder $container)
     {

@@ -3,38 +3,30 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <defaults public="false" />
-        <service id="Kematjaya\User\Repo\KmjUserRepoInterface" alias="kematjaya.user_repo" public="true"/>
-        <service id="Kematjaya\User\DataFixtures\UserFixtures" class="Kematjaya\User\DataFixtures\UserFixtures">
+        <defaults public="true" />
+        <service id="Kematjaya\UserBundle\Repo\KmjUserRepoInterface" alias="kematjaya.user_repo" public="true"/>
+        <service id="Kematjaya\UserBundle\DataFixtures\UserFixtures" class="Kematjaya\UserBundle\DataFixtures\UserFixtures">
             <argument type="service" id="kematjaya.user_repo" />
             <argument type="service" id="security.encoder_factory.generic" />
         </service>
-        <service id="Kematjaya\User\Security\KmjLoginAuthenticator" class="Kematjaya\User\Security\KmjLoginAuthenticator">
+        <service id="Kematjaya\UserBundle\Security\KmjLoginAuthenticator" class="Kematjaya\UserBundle\Security\KmjLoginAuthenticator">
             <argument type="service" id="parameter_bag" />
             <argument type="service" id="kematjaya.user_repo" />
             <argument type="service" id="router.default" />
             <argument type="service" id="security.csrf.token_manager" />
             <argument type="service" id="security.user_password_encoder.generic" />
         </service>
-        <service id="Kematjaya\User\Controller\KmjSecurityController" class="Kematjaya\User\Controller\KmjSecurityController" public="true">
+        <service id="Kematjaya\UserBundle\Controller\KmjSecurityController" class="Kematjaya\UserBundle\Controller\KmjSecurityController" public="true">
             <argument type="service" id="security.authentication_utils" />
             <argument type="service" id="kematjaya.user_repo" />
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>
         </service>
-        <service id="Kematjaya\User\Form\ChangePasswordType" class="Kematjaya\User\Form\ChangePasswordType">
+        <service id="Kematjaya\UserBundle\Form\ChangePasswordType" class="Kematjaya\UserBundle\Form\ChangePasswordType">
             <argument type="service" id="security.encoder_factory.generic" />
             <argument type="service" id="security.user_password_encoder.generic" />
             <tag name="form.type"/>
         </service>
-        <!--<service id="Kematjaya\Currency\DataTransformer\PriceDataTransformer" class="Kematjaya\Currency\DataTransformer\PriceDataTransformer">
-            <argument type="service" id="Kematjaya\Currency\Lib\CurrencyFormat" />
-        </service>
-        
-        <service id="Kematjaya\Currency\Twig\PriceExtension" class="Kematjaya\Currency\Twig\PriceExtension">
-            <argument type="service" id="Kematjaya\Currency\Lib\CurrencyFormat" />
-            <tag name="twig.extension"/>
-        </service>-->
     </services>
 </container>
