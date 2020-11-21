@@ -10,7 +10,7 @@
    ```
 3. create file config/packages/kmj_user.yml
    ```
-   kmj_user:
+   user:
     route:
         login: kmj_user_login
         auth_success: path if login success
@@ -22,7 +22,7 @@
     namespace App\Entity;
 
     use Doctrine\ORM\Mapping as ORM;
-    use Kematjaya\User\Entity\KmjUserInterface;
+    use Kematjaya\UserBundle\Entity\KmjUserInterface;
 
     /**
      * @ORM\Entity(repositoryClass="App\Repository\MyUserRepository")
@@ -90,9 +90,11 @@
         public function getRoles(): array
         {
             $roles = $this->roles;
-            // guarantee every user at least has ROLE_USER
-            $roles[] = self::ROLE_USER;
-
+            if(empty($roles))
+            {
+               $roles[] = self::ROLE_USER;
+            }
+            
             return array_unique($roles);
         }
 
@@ -132,7 +134,7 @@
         public function eraseCredentials()
         {
             // If you store any temporary, sensitive data on the user, clear it here
-            // $this->plainPassword = null;
+            $this->is_active = false;
         }
 
         public function getName(): ?string
@@ -182,18 +184,18 @@
                    path: kmj_user_logout
                guard:
                    authenticators:
-                       - Kematjaya\User\Security\KmjLoginAuthenticator
+                       - Kematjaya\UserBundle\Security\KmjLoginAuthenticator
    ```
 6. import route, update file config/routes/annotations.yaml
    ```
    kmj_user:
-    resource: '@KmjUserBundle/Resources/config/routing/all.xml'
+    resource: '@UserBundle/Resources/config/routing/all.xml'
    ```
 7. update user repo, src/Repository/MyUserRepository.php
    ```
    use App\Entity\MyUser;
-   use Kematjaya\User\Entity\KmjUserInterface;
-   use Kematjaya\User\Repo\KmjUserRepoInterface;
+   use Kematjaya\UserBundle\Entity\KmjUserInterface;
+   use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
    ...
    class MyUserRepository extends ServiceEntityRepository implements KmjUserRepoInterface
    {
@@ -202,6 +204,11 @@
        {
             return new MyUser();
        }  
+       
+       public function findOneByUsernameAndActive(string $username): ?KmjUserInterface 
+       {
+            return $this->findOneBy(['username' => $username, 'is_active' => true]);
+       }
    }
    ```
 8. add Repo to Service, config/services.yml
@@ -216,7 +223,9 @@
    services:
        ....
        UserFixtures:
-           class: Kematjaya\User\DataFixtures\UserFixtures
+           class: Kematjaya\UserBundle\DataFixtures\UserFixtures
+           tags: 
+               - doctrine.fixture.orm
    ```
    then run on command :
    ```
