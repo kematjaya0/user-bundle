@@ -3,5 +3,5 @@
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
     <import
-        resource="@KmjUserBundle/Resources/config/routing/user.xml" prefix="/kmj-user"/>
+        resource="@UserBundle/Resources/config/routing/user.xml" prefix="/kmj-user"/>
 </routes>

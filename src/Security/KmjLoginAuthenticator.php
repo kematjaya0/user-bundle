@@ -41,7 +41,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
             CsrfTokenManagerInterface $csrfTokenManager, 
             UserPasswordEncoderInterface $passwordEncoder)
     {
-        $this->config = $containerBag->get('kmj_user');
+        $this->config = $containerBag->get('user');
         $this->kmjUserRepo = $kmjUserRepo;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;

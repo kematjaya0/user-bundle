@@ -26,7 +26,7 @@ class KmjSecurityController extends AbstractController
     {
         if ($this->getUser()) 
         {
-            $config = $this->container->getParameter('kmj_user');
+            $config = $this->container->getParameter('user');
             if(!isset($config['route']['auth_success']))
             {
                 throw new \Exception("please set router.auth_succes key under kmj_user config");
@@ -39,7 +39,7 @@ class KmjSecurityController extends AbstractController
         $error = $this->authenticationUtils->getLastAuthenticationError();
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
-        return $this->render('@KmjUser/security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('@User/security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
 
     public function logout()
@@ -50,7 +50,7 @@ class KmjSecurityController extends AbstractController
     
     public function profile()
     {
-        return $this->render('@KmjUser/security/profile.html.twig', [
+        return $this->render('@User/security/profile.html.twig', [
             'kmj_user' => $this->getUser(),
             'title' => 'profile'
         ]);
@@ -79,7 +79,7 @@ class KmjSecurityController extends AbstractController
                     $em->persist($form->getData());
                     $em->flush();
                     $con->commit();
-                    $config = $this->container->getParameter('kmj_user');
+                    $config = $this->container->getParameter('user');
                     if(!isset($config['route']['auth_success']))
                     {
                         throw new \Exception("please set router.auth_succes key under kmj_user config");
@@ -99,9 +99,9 @@ class KmjSecurityController extends AbstractController
             }
         }
         
-        return $this->render('@KmjUser/security/change_password.html.twig', array(
+        return $this->render('@User/security/change_password.html.twig', array(
             'title' => 'change_password',
-           'form' => $form->createView() 
+            'form' => $form->createView() 
         ));
     }
     

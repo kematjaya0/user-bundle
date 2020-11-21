@@ -11,7 +11,7 @@ class Configuration implements ConfigurationInterface
 {
     public function getConfigTreeBuilder(): TreeBuilder 
     {
-        $treeBuilder = new TreeBuilder('kmj_user');
+        $treeBuilder = new TreeBuilder('user');
         $rootNode = $treeBuilder->getRootNode();
         
         $rootNode
