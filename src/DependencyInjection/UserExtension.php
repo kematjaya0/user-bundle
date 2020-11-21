@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class UserBundleExtension extends Extension 
+class UserExtension extends Extension 
 {
     public function load(array $configs, ContainerBuilder $container) 
     {
