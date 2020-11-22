@@ -2,6 +2,7 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Kematjaya\UserBundle\Entity\ClientChangePassword;
 use Kematjaya\UserBundle\Form\ChangePasswordType;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Symfony\Component\Form\FormInterface;
@@ -76,7 +77,12 @@ class KmjSecurityController extends AbstractController
         $config = $this->getConfigs();
         
         $user = $this->userRepo->find($this->getUser()->getId());
-        $form = $this->createForm(ChangePasswordType::class, $user, ["action" => $this->generateUrl("kmj_user_change_password")]);
+        if(!$user)
+        {
+            throw new \Exception('cannot find user');
+        }
+        
+        $form = $this->createForm(ChangePasswordType::class, new ClientChangePassword($user), ["action" => $this->generateUrl("kmj_user_change_password")]);
         $form->handleRequest($request);
         if ($form->isSubmitted())
         {
@@ -87,7 +93,9 @@ class KmjSecurityController extends AbstractController
                 $con->beginTransaction();
                     
                 try{
-                    $em->persist($form->getData());
+                    
+                    $user = $form->getData()->getUser();
+                    $em->persist($user);
                     $em->flush();
                     $con->commit();
                     

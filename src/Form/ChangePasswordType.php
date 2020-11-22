@@ -8,7 +8,7 @@
 
 namespace Kematjaya\UserBundle\Form;
 
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Entity\ClientChangePasswordInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -60,9 +60,10 @@ class ChangePasswordType extends AbstractType
             
             $error = false;
             // jika password lama tidak cocok
-            if(!$this->passwordEncoder->isPasswordValid($data, $data->getPasswordOld())) 
+            if(!$this->passwordEncoder->isPasswordValid($data->getUser(), $data->getPasswordOld())) 
             {
                 $form->get("password_old")->addError(new FormError("old password is wrong! "));
+                
                 $error = true;
             }
             
@@ -72,10 +73,11 @@ class ChangePasswordType extends AbstractType
                 $error = true;
             }
                 
-            $encoder = $this->encoderFactory->getEncoder($data);
-            $password = $encoder->encodePassword( $data->getPasswordNew(), $data->getUsername());
-            if(!$error) {
-                $data->setPassword($password);
+            if(!$error) 
+            {
+                $encoder = $this->encoderFactory->getEncoder($data->getUser());
+                $password = $encoder->encodePassword( $data->getPasswordNew(), $data->getUser()->getSalt());
+                $data->getUser()->setPassword($password);
                 $event->setData($data);
             }
         });
@@ -84,7 +86,7 @@ class ChangePasswordType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => KmjUserInterface::class,
+            'data_class' => ClientChangePasswordInterface::class,
         ]);
     }
 }
