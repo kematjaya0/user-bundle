@@ -22,18 +22,25 @@ class KmjSecurityController extends AbstractController
         $this->userRepo = $userRepo;
     }
     
+    private function getConfigs()
+    {
+        $config = $this->container->getParameter('user');
+        if(!isset($config['route']['auth_success']))
+        {
+            throw new \Exception("please set router.auth_succes key under kmj_user config");
+        }
+        
+        return $config['route'];
+    }
+    
     public function login(): Response
     {
         if ($this->getUser()) 
         {
-            $config = $this->container->getParameter('user');
-            if(!isset($config['route']['auth_success']))
-            {
-                throw new \Exception("please set router.auth_succes key under kmj_user config");
-            }
+            $config = $this->getConfigs();
             
             $this->addFlash("info", 'wellcome back : '. $this->getUser()->getUsername());
-            return $this->redirectToRoute($config['route']['auth_success']);
+            return $this->redirectToRoute($config['auth_success']);
         }
 
         $error = $this->authenticationUtils->getLastAuthenticationError();
@@ -50,9 +57,11 @@ class KmjSecurityController extends AbstractController
     
     public function profile()
     {
+        $config = $this->getConfigs();
+        
         return $this->render('@User/security/profile.html.twig', [
             'kmj_user' => $this->getUser(),
-            'title' => 'profile'
+            'title' => 'profile', 'back_path' => $config['auth_success']
         ]);
     }
     
@@ -63,6 +72,8 @@ class KmjSecurityController extends AbstractController
         {
             return $this->redirectToRoute('kmj_user_logout');
         }
+        
+        $config = $this->getConfigs();
         
         $user = $this->userRepo->find($this->getUser()->getId());
         $form = $this->createForm(ChangePasswordType::class, $user, ["action" => $this->generateUrl("kmj_user_change_password")]);
@@ -79,14 +90,9 @@ class KmjSecurityController extends AbstractController
                     $em->persist($form->getData());
                     $em->flush();
                     $con->commit();
-                    $config = $this->container->getParameter('user');
-                    if(!isset($config['route']['auth_success']))
-                    {
-                        throw new \Exception("please set router.auth_succes key under kmj_user config");
-                    }
-
+                    
                     $this->addFlash("info", "change password successfully.");
-                    return $this->redirectToRoute($config['route']['auth_success']);
+                    return $this->redirectToRoute($config['auth_success']);
                 } catch (\Exception $ex) {
                     $con->rollBack();
                     
@@ -101,20 +107,23 @@ class KmjSecurityController extends AbstractController
         
         return $this->render('@User/security/change_password.html.twig', array(
             'title' => 'change_password',
-            'form' => $form->createView() 
+            'form' => $form->createView(),
+            'back_path' => $config['auth_success']
         ));
     }
     
     protected function getErrorsFromForm(FormInterface $form)
     {
         $errors = array();
-        foreach ($form->getErrors() as $error) {
+        foreach ($form->getErrors() as $error) 
+        {
             $errors[] = $error->getMessage();
         }
         
         foreach ($form->all() as $childForm) {
             if ($childForm instanceof FormInterface) {
-                if ($childErrors = $this->getErrorsFromForm($childForm)) {
+                if ($childErrors = $this->getErrorsFromForm($childForm)) 
+                {
                     $errors[$childForm->getName()] = implode(", ", $childErrors);
                 }
             }

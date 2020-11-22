@@ -2,6 +2,8 @@
 
 {% block title %}{{ title|trans }}: {{ kmj_user.username }} {% endblock %}
 
+{% block titlePage %}{{title|trans}}{% endblock %}
+
 {% block body %}
     
     <table class="table table-bordered">
@@ -16,9 +18,16 @@
             </tr>
             <tr>
                 <th>{{ 'roles'|trans }}</th>
-                <td>{{ kmj_user.roles ? kmj_user.roles|json_encode : '' }}</td>
+                <td>
+                    <ul>
+                    {% for role in kmj_user.roles %}
+                        <li>{{ role|trans }}</li>
+                    {% endfor %}
+                    </ul>
+                </td>
             </tr>
         </tbody>
     </table>
-                
+    
+    <a href="{{ path(back_path) }}" class="btn btn-block btn-primary">{{ 'back_to_home'|trans }}</a>
 {% endblock %}
