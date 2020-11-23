@@ -20,4 +20,10 @@ interface KmjUserInterface extends UserInterface
     
     public function getIsActive(): ?bool;
     
+    public function setPassword(string $password): self; 
+    
+    public function setRoles(array $roles): self;
+    
+    public function setUsername(string $username):self;
+    
 }
