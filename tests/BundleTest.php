@@ -4,16 +4,20 @@ namespace Kematjaya\UserBundle\Tests;
 
 use Kematjaya\UserBundle\Tests\AppKernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 class BundleTest extends WebTestCase 
 {
-    public function testInitBundle()
+    public function testInitBundle(): ContainerInterface
     {
         $client = static::createClient();
         $container = $client->getContainer();
-        dump($container);exit;
+        
+        $this->assertInstanceOf(ContainerInterface::class, $container);
+        return $container;
         // Test if the service exists
         //$this->assertTrue($container->has('kematjaya.breadcrumbs_builder'));
         //$this->assertTrue($container->has('kematjaya.breadcrumbs_extension'));

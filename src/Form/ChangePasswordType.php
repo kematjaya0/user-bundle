@@ -22,14 +22,19 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 
 class ChangePasswordType extends AbstractType
 {
-    
+    /**
+     * 
+     * @var EncoderFactoryInterface
+     */
     private $encoderFactory;
+    
+    /**
+     * 
+     * @var UserPasswordEncoderInterface
+     */
     private $passwordEncoder;
     
-    public function __construct(
-        EncoderFactoryInterface $encoderFactory, 
-        UserPasswordEncoderInterface $passwordEncoder) 
-    {
+    public function __construct(EncoderFactoryInterface $encoderFactory, UserPasswordEncoderInterface $passwordEncoder) { 
         $this->encoderFactory = $encoderFactory;
         $this->passwordEncoder = $passwordEncoder;
     }
@@ -37,52 +42,56 @@ class ChangePasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('password_old', PasswordType::class, [
+            ->add(
+                'password_old', PasswordType::class, [
                 "required" => true, "label" => "old_password",
-            ])
-            ->add('password_new', PasswordType::class, [
+                ]
+            )
+            ->add(
+                'password_new', PasswordType::class, [
                 "required" => true, 
                 "label" => "password_new"
-            ])
-            ->add('password_re_new', PasswordType::class, [
+                ]
+            )
+            ->add(
+                'password_re_new', PasswordType::class, [
                 "required" => true, 
                 "label" => "password_re_new"
-            ]);
+                ]
+            );
         
         
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function(FormEvent $event) {
-            $data = $event->getData();
-            $form = $event->getForm();
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $data = $event->getData();
+                $form = $event->getForm();
             
-            $error = false;
-            // jika password lama tidak cocok
-            if(!$this->passwordEncoder->isPasswordValid($data->getUser(), $data->getPasswordOld())) 
-            {
-                $form->get("password_old")->addError(new FormError("old password is wrong! "));
+                if (!$this->passwordEncoder->isPasswordValid($data->getUser(), $data->getPasswordOld())) {
+                    $form->get("password_old")->addError(new FormError("old password is wrong! "));
                 
-                $error = true;
-            }
+                    return;
+                }
             
-            if($data->getPasswordNew() !== $data->getPasswordReNew()) 
-            {
-                $form->get("password_re_new")->addError(new FormError("new password is not match!"));
-                $error = true;
-            }
+                if ($data->getPasswordNew() !== $data->getPasswordReNew()) {
+                    $form->get("password_re_new")->addError(new FormError("new password is not match!"));
+                    
+                    return;
+                }
                 
-            if(!$error) 
-            {
                 $encoder = $this->encoderFactory->getEncoder($data->getUser());
-                $password = $encoder->encodePassword( $data->getPasswordNew(), $data->getUser()->getSalt());
+                $password = $encoder->encodePassword($data->getPasswordNew(), $data->getUser()->getSalt());
                 $data->getUser()->setPassword($password);
                 $event->setData($data);
             }
-        });
+        );
     }
     
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => ClientChangePasswordInterface::class,
-        ]);
+            ]
+        );
     }
 }

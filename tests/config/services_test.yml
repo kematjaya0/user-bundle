@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+    
+    Symfony\Component\Security\Http\Authentication\AuthenticationUtils:
+        class: Symfony\Component\Security\Http\Authentication\AuthenticationUtils
+        
+    Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
+        class: Kematjaya\UserBundle\Tests\Repository\KmjUserRepository
+        
+    Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface:
+        class: Symfony\Component\Security\Core\Encoder\EncoderFactory
+        arguments: 
+            - []
+            
+    Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface:
+        class: Symfony\Component\Security\Core\Encoder\UserPasswordEncoder

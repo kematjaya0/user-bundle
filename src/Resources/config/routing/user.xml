@@ -8,11 +8,13 @@
     <route id="kmj_user_logout" path="/logout" methods="GET">
         <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::logout</default>
     </route>
-    <route id="kmj_user_profile" path="/profile" methods="GET">
-        <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::profile</default>
-    </route>
     <route id="kmj_user_change_password" path="/change-password" methods="GET POST">
         <default key="_controller">Kematjaya\UserBundle\Controller\KmjSecurityController::changePassword</default>
     </route>
-    
+    <route id="kmj_user_profile" path="/profile" methods="GET">
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjController::profile</default>
+    </route>
+    <route id="kmj_user_reset_password" path="/reset-password" methods="GET POST">
+        <default key="_controller">Kematjaya\UserBundle\Controller\KmjController::resetPassword</default>
+    </route>
 </routes>

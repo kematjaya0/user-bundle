@@ -1,0 +1,29 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+        
+    Kematjaya\UserBundle\Security\KmjLoginAuthenticator:
+        class: Kematjaya\UserBundle\Security\KmjLoginAuthenticator
+        
+    Kematjaya\UserBundle\Controller\KmjSecurityController:
+        class: Kematjaya\UserBundle\Controller\KmjSecurityController
+        calls: 
+            - setContainer: ['@service_container']
+            
+    Kematjaya\UserBundle\Controller\KmjController:
+        class: Kematjaya\UserBundle\Controller\KmjController
+        calls: 
+            - setContainer: ['@service_container']
+        
+    Kematjaya\UserBundle\Form\ChangePasswordType:
+        class: Kematjaya\UserBundle\Form\ChangePasswordType
+        
+    Kematjaya\UserBundle\Form\ResetPasswordType:
+        class: Kematjaya\UserBundle\Form\ResetPasswordType
+        
+    Kematjaya\UserBundle\DataFixtures\UserFixtures:
+        class: Kematjaya\UserBundle\DataFixtures\UserFixtures
+        tags: 
+            - doctrine.fixture.orm

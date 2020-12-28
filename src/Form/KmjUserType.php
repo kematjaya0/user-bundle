@@ -16,29 +16,29 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
+/**
+ * 
+ * @author Nur Hidayatullah <kematjaya0@hmail.com>
+ */
 class KmjUserType extends AbstractType
 {
-    protected $encoderFactory;
     
-    protected $roleHierarchy;
+    /**
+     * 
+     * @var EncoderFactoryInterface
+     */
+    private $encoderFactory;
     
-    protected $tokenStorage;
+    /**
+     * 
+     * @var array
+     */
+    private $roleList = [];
     
-    protected $roleList = [];
-    
-    public function __construct(
-            TokenStorageInterface $token, 
-            EncoderFactoryInterface $encoderFactory, 
-            RoleHierarchyInterface $roleHierarchy) 
-    {
+    public function __construct(TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy) { 
         $this->encoderFactory = $encoderFactory;
-        $this->roleHierarchy = $roleHierarchy;
-        $this->tokenStorage = $token;
-        
-        if($token->getToken())
-        {
-            foreach($roleHierarchy->getReachableRoleNames($token->getToken()->getRoleNames()) as $role) 
-            {
+        if ($token->getToken()) {
+            foreach ($roleHierarchy->getReachableRoleNames($token->getToken()->getRoleNames()) as $role) {
                 $this->roleList[$role] = $role;
             }
         }
@@ -47,45 +47,47 @@ class KmjUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username', TextType::class, [
+            ->add(
+                'username', TextType::class, [
                 'attr' => ['readonly' => (bool) $builder->getForm()->getData()->getId()]
-            ])
+                ]
+            )
             ->add('name')
             ->add('roles')
-            ->add('is_active')
-        ;
+            ->add('is_active');
         
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
-            $data = $event->getData();
-            $form = $event->getForm();
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+                $data = $event->getData();
+                $form = $event->getForm();
             
-            $form
-                ->add('roles', ChoiceType::class, [
-                    'label' =>'roles',
-                    'choices' => $this->roleList,
-                    'multiple'  => true
-                ])
-            ;
-            if (!$data || null === $data->getId()) 
-            {
-                $form->add('password', PasswordType::class);
+                $form
+                    ->add(
+                        'roles', ChoiceType::class, [
+                        'label' =>'roles',
+                        'choices' => $this->roleList,
+                        'multiple'  => true
+                        ]
+                    );
+                if (!$data || null === $data->getId()) {
+                    $form->add('password', PasswordType::class);
+                }
             }
-        });
+        );
         
-        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event){
-            $data = $event->getData();
-            $form = $event->getForm();
-            if(!$data->getId()) 
-            {
-                $encoder = $this->encoderFactory->getEncoder($data);
-                $password = $encoder->encodePassword( $data->getPassword(), $data->getUsername());
-                $data->setPassword($password);
-                $event->setData($data);
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $data = $event->getData();
+                if (!$data->getId()) {
+                    $encoder = $this->encoderFactory->getEncoder($data);
+                    $password = $encoder->encodePassword($data->getPassword(), $data->getUsername());
+                    $data->setPassword($password);
+                    $event->setData($data);
+                }
             }
-        });
+        );
         
-        if($options['event_subcriber'])
-        {
+        if ($options['event_subcriber']) {
             $builder->addEventSubscriber($options['event_subcriber']);
         }
     }
@@ -94,10 +96,12 @@ class KmjUserType extends AbstractType
     {
         $resolver->setDefined('event_subcriber');
         $resolver->setAllowedTypes('event_subcriber', ["null", EventSubscriberInterface::class]);
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => KmjUserInterface::class,
             'event_subcriber' => null
-        ]);
+            ]
+        );
     }
 }
 

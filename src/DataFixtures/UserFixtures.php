@@ -6,7 +6,7 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
