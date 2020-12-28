@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class UserCompilerPass implements CompilerPassInterface 
+class UserCompilerPass implements CompilerPassInterface
 {
     //put your code here
     public function process(ContainerBuilder $container) 

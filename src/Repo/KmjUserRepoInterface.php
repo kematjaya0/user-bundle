@@ -12,7 +12,7 @@ interface KmjUserRepoInterface
     /**
      * Get KmjUser object by username
      * 
-     * @param string $identityNumber identity number of entity
+     * @param  string $identityNumber identity number of entity
      * @return KmjUserInterface|null
      */
     public function findOneByIdentityNumber(string $identityNumber):?KmjUserInterface;
@@ -20,7 +20,7 @@ interface KmjUserRepoInterface
     /**
      * Get KmjUser object by username and is active
      * 
-     * @param string $username
+     * @param  string $username
      * @return KmjUserInterface|null
      */
     public function findOneByUsernameAndActive(string $username):?KmjUserInterface;

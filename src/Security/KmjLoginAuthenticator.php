@@ -35,12 +35,12 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
     private $authSuccessRoute;
 
     public function __construct(
-            ContainerBagInterface $containerBag,
-            KmjUserRepoInterface $kmjUserRepo, 
-            UrlGeneratorInterface $urlGenerator, 
-            CsrfTokenManagerInterface $csrfTokenManager, 
-            UserPasswordEncoderInterface $passwordEncoder)
-    {
+        ContainerBagInterface $containerBag,
+        KmjUserRepoInterface $kmjUserRepo, 
+        UrlGeneratorInterface $urlGenerator, 
+        CsrfTokenManagerInterface $csrfTokenManager, 
+        UserPasswordEncoderInterface $passwordEncoder
+    ) {
         $this->config = $containerBag->get('user');
         $this->kmjUserRepo = $kmjUserRepo;
         $this->urlGenerator = $urlGenerator;

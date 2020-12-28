@@ -40,7 +40,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
                 $user->setName(strtoupper($username));
                 $user->setIsActive(true);
                 $encoder = $this->encoderFactory->getEncoder($user);
-                $password = $encoder->encodePassword( 'admin123', $user->getUsername());
+                $password = $encoder->encodePassword('admin123', $user->getUsername());
                 $user->setPassword($password);
                 $user->setRoles([$role]);
                 $manager->persist($user);

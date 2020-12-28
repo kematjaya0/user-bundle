@@ -35,7 +35,8 @@ class KmjUserType extends AbstractType
      */
     private $roleList = [];
     
-    public function __construct(TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy) { 
+    public function __construct(TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy)
+    { 
         $this->encoderFactory = $encoderFactory;
         if ($token->getToken()) {
             foreach ($roleHierarchy->getReachableRoleNames($token->getToken()->getRoleNames()) as $role) {

@@ -2,6 +2,7 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Kematjaya\UserBundle\Exception\UserNotFoundException;
 use Kematjaya\UserBundle\Entity\ClientChangePassword;
 use Kematjaya\UserBundle\Form\ChangePasswordType;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
@@ -12,8 +13,16 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class KmjSecurityController extends AbstractKmjController
 {
+    /**
+     * 
+     * @var AuthenticationUtils
+     */
     protected $authenticationUtils;
     
+    /**
+     * 
+     * @var KmjUserRepoInterface
+     */
     protected $userRepo;
     
     public function __construct(AuthenticationUtils $authenticationUtils, KmjUserRepoInterface $userRepo) 
@@ -22,6 +31,11 @@ class KmjSecurityController extends AbstractKmjController
         $this->userRepo = $userRepo;
     }
     
+    /**
+     * Login page
+     * 
+     * @return Response
+     */
     public function login(): Response
     {
         if ($this->getUser()) {
@@ -42,22 +56,29 @@ class KmjSecurityController extends AbstractKmjController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
     
-    public function changePassword(Request $request) 
+    /**
+     * Change password page
+     * 
+     * @param  Request $request
+     * @return Response
+     * @throws UserNotFoundException
+     */
+    public function changePassword(Request $request) : Response
     {
-        if(!$this->getUser()) {
+        if (!$this->getUser()) {
             return $this->redirectToRoute('kmj_user_logout');
         }
         
         $config = $this->getConfigs();
         
         $user = $this->userRepo->find($this->getUser()->getId());
-        if(!$user) {
-            throw new \Exception('cannot find user');
+        if (!$user) {
+            throw new UserNotFoundException($this->getUser()->getId());
         }
         
         $form = $this->createForm(ChangePasswordType::class, new ClientChangePassword($user), ["action" => $this->generateUrl("kmj_user_change_password")]);
         $object = parent::processForm($request, $form);
-        if($object) {
+        if ($object) {
             return $this->redirectToRoute($config['auth_success']);
         }
         
@@ -79,10 +100,10 @@ class KmjSecurityController extends AbstractKmjController
      */
     protected function saveObject($object, \Doctrine\ORM\EntityManagerInterface $manager) 
     {
-        if(!$object instanceof ClientChangePassword) {
+        if (!$object instanceof ClientChangePassword) {
             throw new \Exception(sprintf("object type not allowed: %s", ClientChangePassword::class));
         }
         
-        parent::saveObject($object->getUser(), $manager);
+        return parent::saveObject($object->getUser(), $manager);
     }
 }

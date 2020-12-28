@@ -34,7 +34,8 @@ class ChangePasswordType extends AbstractType
      */
     private $passwordEncoder;
     
-    public function __construct(EncoderFactoryInterface $encoderFactory, UserPasswordEncoderInterface $passwordEncoder) { 
+    public function __construct(EncoderFactoryInterface $encoderFactory, UserPasswordEncoderInterface $passwordEncoder)
+    { 
         $this->encoderFactory = $encoderFactory;
         $this->passwordEncoder = $passwordEncoder;
     }

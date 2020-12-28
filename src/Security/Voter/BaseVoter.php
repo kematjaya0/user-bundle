@@ -46,18 +46,17 @@ abstract class BaseVoter extends Voter
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token)
     {
         $user = $token->getUser();
-        if (!$user instanceof UserInterface) 
-        {
+        if (!$user instanceof UserInterface) {
             return false;
         }
         
         switch($attribute)
         {
-            case self::ACTION_CREATE:
-            case self::ACTION_EDIT:
-            case self::ACTION_VIEW:
-            case self::ACTION_DELETE:
-                return true;
+        case self::ACTION_CREATE:
+        case self::ACTION_EDIT:
+        case self::ACTION_VIEW:
+        case self::ACTION_DELETE:
+            return true;
                 break;
         }
         
@@ -70,15 +69,13 @@ abstract class BaseVoter extends Voter
 
         foreach ($attributes as $attribute) 
         {
-            if (!$this->supports($attribute, $subject)) 
-            {
+            if (!$this->supports($attribute, $subject)) {
                 continue;
             }
 
             $vote = self::ACCESS_DENIED;
 
-            if ($this->voteOnAttribute($attribute, $subject, $token)) 
-            {
+            if ($this->voteOnAttribute($attribute, $subject, $token)) {
                 return self::ACCESS_GRANTED;
             }
         }

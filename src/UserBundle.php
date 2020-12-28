@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class UserBundle extends Bundle 
+class UserBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {

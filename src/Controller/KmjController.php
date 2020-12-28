@@ -11,6 +11,8 @@ use Kematjaya\UserBundle\Entity\ResettingPassword;
 use Kematjaya\UserBundle\Exception\UserNotFoundException;
 use Kematjaya\UserBundle\Form\ResetPasswordType;
 use Kematjaya\UserBundle\Controller\AbstractKmjController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @package Kematjaya\UserBundle\Controller
@@ -20,7 +22,12 @@ use Kematjaya\UserBundle\Controller\AbstractKmjController;
 class KmjController extends AbstractKmjController
 {
     
-    public function profile()
+    /**
+     * Get profile page
+     * 
+     * @return Response
+     */
+    public function profile(): Response
     {
         $config = $this->getConfigs();
         
@@ -32,10 +39,19 @@ class KmjController extends AbstractKmjController
         );
     }
     
-    public function resetPassword(Request $request, KmjUserRepoInterface $repo, string $identityNumber)
+    /**
+     * Reset password page
+     * 
+     * @param  Request              $request
+     * @param  KmjUserRepoInterface $repo
+     * @param  string               $identityNumber
+     * @return Response
+     * @throws UserNotFoundException
+     */
+    public function resetPassword(Request $request, KmjUserRepoInterface $repo, string $identityNumber): Response
     {
         $user = $repo->findOneByIdentityNumber($identityNumber);
-        if(!$user) {
+        if (!$user) {
             throw new UserNotFoundException($identityNumber);
         }
         
@@ -44,15 +60,16 @@ class KmjController extends AbstractKmjController
             ResetPasswordType::class, $userReset
         );
         
+        $config = $this->getConfigs();
         $object = parent::processForm($request, $form);
-        if($object) {
-            $config = $this->getConfigs();
-            return $this->redirectToRoute($config['auth_success']);
+        if ($object) {
+            return $this->redirectToRoute($config['reset_password_redirect_path']);
         }
         
         return $this->render(
-            'pages/pti-user/reset-password.html.twig', [
-            'data' => $user, 'form' => $form->createView()
+            '@User/security/reset-password.html.twig', [
+            'data' => $user, 'form' => $form->createView(),
+            'title' => 'reset_password',  'back_path' => $config['reset_password_redirect_path']
             ]
         );
     }
@@ -60,16 +77,16 @@ class KmjController extends AbstractKmjController
     /**
      * Saving object into database
      * 
-     * @param  ResettingPassword   $object
+     * @param  ResettingPassword      $object
      * @param  EntityManagerInterface $manager
-     * @return type
+     * @return mixed object persisted in database
      */
     protected function saveObject($object, \Doctrine\ORM\EntityManagerInterface $manager) 
     {
-        if(!$object instanceof ResettingPassword) {
+        if (!$object instanceof ResettingPassword) {
             throw new \Exception(sprintf("object type not allowed: %s", ResettingPassword::class));
         }
         
-        parent::saveObject($object->getUser(), $manager);
+        return parent::saveObject($object->getUser(), $manager);
     }
 }

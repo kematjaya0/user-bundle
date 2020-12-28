@@ -13,7 +13,7 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  * @license https://opensource.org/licenses/MIT MIT
  * @author  Nur Hidayatullah <kematjaya0@gmail.com>
  */
-interface ResettingPasswordInterface 
+interface ResettingPasswordInterface
 {
     public function getUser():?KmjUserInterface;
     

@@ -5,7 +5,7 @@ namespace Kematjaya\UserBundle\Entity;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
-interface ClientChangePasswordInterface 
+interface ClientChangePasswordInterface
 {
     public function setUser(KmjUserInterface $user):self;
     

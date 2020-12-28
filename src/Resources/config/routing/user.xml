@@ -14,7 +14,7 @@
     <route id="kmj_user_profile" path="/profile" methods="GET">
         <default key="_controller">Kematjaya\UserBundle\Controller\KmjController::profile</default>
     </route>
-    <route id="kmj_user_reset_password" path="/reset-password" methods="GET POST">
+    <route id="kmj_user_reset_password" path="/{identityNumber}/reset-password" methods="GET POST">
         <default key="_controller">Kematjaya\UserBundle\Controller\KmjController::resetPassword</default>
     </route>
 </routes>
