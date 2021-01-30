@@ -6,7 +6,7 @@
 
 namespace Kematjaya\UserBundle\Subscriber;
 
-use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @package Kematjaya\UserBundle\Subscriber
