@@ -6,9 +6,12 @@
 
 namespace Kematjaya\UserBundle\Subscriber;
 
+use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -42,11 +45,18 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
      */
     private $roleHierarchy;
     
-    public function __construct(TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy)
+    /**
+     * 
+     * @var KmjUserRepoInterface
+     */
+    private $repo;
+    
+    public function __construct(KmjUserRepoInterface $repo, TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy)
     { 
         $this->encoderFactory = $encoderFactory;
         $this->tokenStorage = $token;
         $this->roleHierarchy = $roleHierarchy;
+        $this->repo = $repo;
     }
     
     public static function getSubscribedEvents(): array
@@ -64,16 +74,22 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
 
         $form
             ->add('username', TextType::class, [
+                'label' => 'username',
                 'attr' => ['readonly' => (bool) $data->getId()]
             ])
             ->add('roles', ChoiceType::class, [
                 'label' =>'roles',
                 'choices' => $this->getRoles(),
                 'multiple'  => true
+            ])
+            ->add('is_active', CheckboxType::class, [
+                'label' => 'is_active'
             ]);
         
         if (null === $data->getId()) {
-            $form->add('password', PasswordType::class);
+            $form->add('password', PasswordType::class, [
+                'label' => 'password'
+            ]);
         }
     }
     
@@ -87,6 +103,15 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         
         if ($data->getId()) {
             
+            return;
+        }
+        
+        $data->setUsername(trim($data->getUsername()));
+        $other = $this->repo->findOneByUsernameAndActive($data->getUsername());
+        if ($other) {
+            $event->getForm()
+                    ->get('username')
+                    ->addError(new FormError(sprintf('username "%s" already used', $data->getUsername())));
             return;
         }
         
