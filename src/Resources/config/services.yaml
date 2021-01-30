@@ -23,6 +23,11 @@ services:
     Kematjaya\UserBundle\Form\ResetPasswordType:
         class: Kematjaya\UserBundle\Form\ResetPasswordType
         
+    Kematjaya\UserBundle\Form\KmjUserType: ~
+    
+    Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface:
+        class: Kematjaya\UserBundle\Subscriber\UserTypeSubscriber
+            
     Kematjaya\UserBundle\DataFixtures\UserFixtures:
         class: Kematjaya\UserBundle\DataFixtures\UserFixtures
         tags: 
