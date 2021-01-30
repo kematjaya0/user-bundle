@@ -9,6 +9,7 @@ namespace Kematjaya\UserBundle\Subscriber;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
@@ -48,7 +49,7 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         $this->roleHierarchy = $roleHierarchy;
     }
     
-    public function getSubscribedEvents(): array
+    public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::POST_SET_DATA => 'postSetData',
@@ -62,14 +63,16 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         $form = $event->getForm();
 
         $form
-            ->add(
-                'roles', ChoiceType::class, [
+            ->add('username', TextType::class, [
+                'attr' => ['readonly' => (bool) $data->getId()]
+            ])
+            ->add('roles', ChoiceType::class, [
                 'label' =>'roles',
                 'choices' => $this->getRoles(),
                 'multiple'  => true
-                ]
-            );
-        if (!$data || null === $data->getId()) {
+            ]);
+        
+        if (null === $data->getId()) {
             $form->add('password', PasswordType::class);
         }
     }

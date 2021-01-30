@@ -4,7 +4,6 @@ namespace Kematjaya\UserBundle\Form;
 
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -31,15 +30,11 @@ class KmjUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                'username', TextType::class, [
-                'attr' => ['readonly' => (bool) $builder->getForm()->getData()->getId()]
-                ]
-            )
+            ->add('username')
             ->add('name')
             ->add('roles')
             ->add('is_active');
-        
+        dump($this->userTypeSubscriber);exit;
         $builder->addEventSubscriber($this->userTypeSubscriber);
         
         if ($options['event_subcriber']) {
