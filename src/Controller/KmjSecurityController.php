@@ -2,6 +2,7 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Kematjaya\UserBundle\Form\LoginType;
 use Kematjaya\UserBundle\Exception\UserNotFoundException;
 use Kematjaya\UserBundle\Entity\ClientChangePassword;
 use Kematjaya\UserBundle\Form\ChangePasswordType;
@@ -48,7 +49,15 @@ class KmjSecurityController extends AbstractKmjController
         $error = $this->authenticationUtils->getLastAuthenticationError();
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
-        return $this->render('@User/security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        $form = $this->createForm(LoginType::class, [
+            'username' => $lastUsername
+        ]);
+        
+        return $this->render('@User/security/login.html.twig', [
+            'last_username' => $lastUsername, 
+            'error' => $error,
+            'form' => $form->createView()
+        ]);
     }
 
     public function logout()

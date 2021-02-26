@@ -57,7 +57,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
     }
 
     public function getCredentials(Request $request)
-    {
+    {dump($request);exit;
         $credentials = [
             'username' => $request->request->get('username'),
             'password' => $request->request->get('password'),

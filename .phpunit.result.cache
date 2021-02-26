@@ -1,1 +1,1 @@
-C:37:"PHPUnit\Runner\DefaultTestResultCache":178:{a:2:{s:7:"defects";a:1:{s:53:"Kematjaya\UserBundle\Tests\BundleTest::testInitBundle";i:4;}s:5:"times";a:1:{s:53:"Kematjaya\UserBundle\Tests\BundleTest::testInitBundle";d:0.015;}}}
+C:37:"PHPUnit\Runner\DefaultTestResultCache":177:{a:2:{s:7:"defects";a:1:{s:53:"Kematjaya\UserBundle\Tests\BundleTest::testInitBundle";i:4;}s:5:"times";a:1:{s:53:"Kematjaya\UserBundle\Tests\BundleTest::testInitBundle";d:0.37;}}}
