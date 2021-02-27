@@ -19,6 +19,8 @@ use Gregwar\CaptchaBundle\Type\CaptchaType;
  */
 class LoginType extends AbstractType
 {
+    const NAME = 'kmj_login';
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -31,5 +33,10 @@ class LoginType extends AbstractType
                 ->add('captcha', CaptchaType::class, [
                     'label' => 'captcha'
                 ]);
+    }
+    
+    public function getBlockPrefix() 
+    {
+        return self::NAME;
     }
 }

@@ -20,10 +20,7 @@
         {% endif %}
         
         {{ form_start(form) }}
-        
             
-            
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
             <div class="form-group has-feedback">
                 {{ form_widget(form.username, {attr: {class: "form-control", placeholder: "username"|trans, required:true, autofocus:true }}) }}
                 <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
@@ -31,6 +28,9 @@
             <div class="form-group has-feedback">
                 {{ form_widget(form.password, {attr: {class: "form-control", placeholder: "password"|trans }}) }}
               <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                {{ form_widget(form.captcha, {attr: {class: "form-control", placeholder: "captcha"|trans }}) }}
             </div>
             <div class="row">
                 <div class="col-xs-8">
