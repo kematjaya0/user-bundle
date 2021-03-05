@@ -210,9 +210,9 @@
             return $this->findOneBy(['username' => $username, 'is_active' => true]);
        }
 
-       public function findOneByUsernameAndActive(string $username): ?KmjUserInterface 
-       {
-            return $this->findOneBy(['username' => trim($username), 'is_active' => true]);
+       public function findOneByIdentityNumber(string $identityNumber): ?KmjUserInterface 
+       {   
+            return $this->find($identityNumber);
        }
    }
    ```
