@@ -11,9 +11,9 @@
 3. create file config/packages/kmj_user.yml
    ```
    user:
-    route:
-        login: kmj_user_login
-        auth_success: path if login success
+        route:
+            login: kmj_user_login
+            auth_success: path if login success
    ```
 4. create entity src/Entity/MyUser.php
    ```
@@ -176,7 +176,7 @@
        providers:
            app_user_provider:
                entity:
-                   class: App\Entity\MyUser
+                    class: App\Entity\MyUser
                     property: username
        firewalls:
            main:
@@ -209,25 +209,21 @@
        {
             return $this->findOneBy(['username' => $username, 'is_active' => true]);
        }
+
+       public function findOneByUsernameAndActive(string $username): ?KmjUserInterface 
+       {
+            return $this->findOneBy(['username' => trim($username), 'is_active' => true]);
+       }
    }
    ```
 8. add Repo to Service, config/services.yml
    ```
    services:
        ....
-       kematjaya.user_repo:
+       Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
            class: App\Repository\MyUserRepository
    ```
-9. for using data dummy for user, use fixture on config/services.yml (optional)
-   ```
-   services:
-       ....
-       UserFixtures:
-           class: Kematjaya\UserBundle\DataFixtures\UserFixtures
-           tags: 
-               - doctrine.fixture.orm
-   ```
-   then run on command :
+9. for insert demo user, then run on command :
    ```
    php bin/console doctrine:fixtures:load
    ```
