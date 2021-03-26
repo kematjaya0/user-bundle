@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Gregwar\CaptchaBundle\Type\CaptchaType;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * @package Kematjaya\UserBundle\Form
@@ -21,6 +22,17 @@ class LoginType extends AbstractType
 {
     const NAME = 'kmj_login';
     
+    /**
+     * 
+     * @var array
+     */
+    private $configs;
+    
+    public function __construct(ParameterBagInterface $bag) 
+    {
+        $this->configs = $bag->get('user');
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -29,10 +41,13 @@ class LoginType extends AbstractType
                 ])
                 ->add('password', PasswordType::class, [
                     'label' => 'password'
-                ])
-                ->add('captcha', CaptchaType::class, [
-                    'label' => 'captcha'
                 ]);
+                
+        if ($this->configs['use_captcha']) {
+            $builder->add('captcha', CaptchaType::class, [
+                'label' => 'captcha'
+            ]);
+        }
     }
     
     public function getBlockPrefix() 

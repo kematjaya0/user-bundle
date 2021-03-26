@@ -4,6 +4,8 @@ namespace Kematjaya\UserBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
@@ -14,19 +16,22 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('user');
         $rootNode = $treeBuilder->getRootNode();
         
-        $rootNode
-                //->fixXmlConfig('path')
-            ->children()
-            ->arrayNode('route')->addDefaultsIfNotSet()
-            ->children()
-            ->scalarNode('login')->defaultValue('kmj_user_login')->end()
-            ->scalarNode('auth_success')->defaultValue('homepage')->end()
-            ->scalarNode('reset_password_redirect_path')->defaultValue('homepage')->end()
-            ->end()
-            ->end()
-            ->end();
+        $this->addRouteConfig($rootNode->children());
         
         return $treeBuilder;
+    }
+    
+    public function addRouteConfig(NodeBuilder $node)
+    {
+        $node
+            ->booleanNode('use_captcha')->defaultTrue()->end()
+            ->arrayNode('route')->addDefaultsIfNotSet()
+                ->children()
+                    ->scalarNode('login')->defaultValue('kmj_user_login')->end()
+                    ->scalarNode('auth_success')->defaultValue('homepage')->end()
+                    ->scalarNode('reset_password_redirect_path')->defaultValue('homepage')->end()
+                ->end()
+            ->end();
     }
 
 }
