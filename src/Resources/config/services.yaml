@@ -4,6 +4,9 @@ services:
         autoconfigure: true
         public: false
         
+    Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
+        class: Kematjaya\UserBundle\Repo\UserRepository
+        
     Kematjaya\UserBundle\Security\KmjLoginAuthenticator:
         class: Kematjaya\UserBundle\Security\KmjLoginAuthenticator
         
