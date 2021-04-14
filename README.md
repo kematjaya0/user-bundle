@@ -23,12 +23,12 @@
            ROLE_ADMINISTRATOR: ROLE_USER
            ROLE_SUPER_USER: ROLE_ADMINISTRATOR
        encoders:
-           Kematjaya\UserBundle\Entity\DefaultUser:
+           Kematjaya\UserBundle\Entity\KmjUser:
               algorithm: auto
        providers:
            app_user_provider:
                entity:
-                    class: Kematjaya\UserBundle\Entity\DefaultUser
+                    class: Kematjaya\UserBundle\Entity\KmjUser
                     property: username
        firewalls:
            main:
