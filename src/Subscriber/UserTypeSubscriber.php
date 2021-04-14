@@ -129,11 +129,10 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
             
             return $roles;
         }
-        
-        
         foreach ($this->roleHierarchy->getReachableRoleNames($this->tokenStorage->getToken()->getRoleNames()) as $role) {
             $roles[$role] = $role;
         }
+        
         return $roles;
     }
 }

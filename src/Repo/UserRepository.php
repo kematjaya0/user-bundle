@@ -14,30 +14,11 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  * @license https://opensource.org/licenses/MIT MIT
  * @author  Nur Hidayatullah <kematjaya0@gmail.com>
  */
-class UserRepository implements KmjUserRepoInterface
+class UserRepository extends KmjUserRepository
 {
     
     public function createUser(): KmjUserInterface 
     {
         return new DefaultUser();
     }
-
-    public function findOneByIdentityNumber(string $identityNumber): ?KmjUserInterface 
-    {
-        return (new DefaultUser())
-                ->setIsActive(true)
-                ->setUsername($identityNumber)
-                ->setName($identityNumber)
-                ;
-    }
-
-    public function findOneByUsernameAndActive(string $username): ?KmjUserInterface 
-    {
-        return (new DefaultUser())
-                ->setIsActive(true)
-                ->setUsername($username)
-                ->setName($username)
-                ;
-    }
-
 }

@@ -46,12 +46,10 @@ class KmjUserType extends AbstractType
     {
         $resolver->setDefined('event_subcriber');
         $resolver->setAllowedTypes('event_subcriber', ["null", EventSubscriberInterface::class]);
-        $resolver->setDefaults(
-            [
+        $resolver->setDefaults([
             'data_class' => KmjUserInterface::class,
             'event_subcriber' => null
-            ]
-        );
+        ]);
     }
 }
 

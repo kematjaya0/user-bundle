@@ -124,7 +124,6 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         }
         
         $user = $this->kmjUserRepo->findOneByUsernameAndActive($credentials['username']);
-
         if (!$user) {
             
             throw new CustomUserMessageAuthenticationException('Username could not be found.');
@@ -175,7 +174,6 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
                 
                 continue;
             }
-            
             $errors[] = sprintf("%s %s", $error->getOrigin() ? $error->getOrigin()->getName() . ': ' : '', $error->getMessage());
         }
         
