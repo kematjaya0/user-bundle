@@ -16,6 +16,10 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  */
 class UserRepository extends KmjUserRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, DefaultUser::class);
+    }
     
     public function createUser(): KmjUserInterface 
     {

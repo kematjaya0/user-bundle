@@ -16,11 +16,6 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class KmjUserRepository extends ServiceEntityRepository implements KmjUserRepoInterface
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, KmjUser::class);
-    }
-
     public function createUser(): KmjUserInterface 
     {
         throw new \Exception(sprintf("please implement method '%s' for create object", 'createUser()'));
