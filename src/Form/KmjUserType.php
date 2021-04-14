@@ -3,10 +3,9 @@
 namespace Kematjaya\UserBundle\Form;
 
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
-use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
+use Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -18,13 +17,13 @@ class KmjUserType extends AbstractType
     
     /**
      * 
-     * @var UserTypeSubscriberInterface
+     * @var UserTypeSubscriberBuilderInterface
      */
-    private $userTypeSubscriber;
+    private $userTypeSubscriberBuilder;
     
-    public function __construct(UserTypeSubscriberInterface $userTypeSubscriber) 
+    public function __construct(UserTypeSubscriberBuilderInterface $userTypeSubscriberBuilder) 
     {
-        $this->userTypeSubscriber = $userTypeSubscriber;
+        $this->userTypeSubscriberBuilder = $userTypeSubscriberBuilder;
     }
     
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -35,20 +34,17 @@ class KmjUserType extends AbstractType
             ->add('roles')
             ->add('is_active');
         
-        $builder->addEventSubscriber($this->userTypeSubscriber);
-        
-        if ($options['event_subcriber']) {
-            $builder->addEventSubscriber($options['event_subcriber']);
+        $className = get_class($builder->getData());
+        $subscriber = $this->userTypeSubscriberBuilder->getSubscriber($className);
+        if ($subscriber) {
+            $builder->addEventSubscriber($subscriber);
         }
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined('event_subcriber');
-        $resolver->setAllowedTypes('event_subcriber', ["null", EventSubscriberInterface::class]);
         $resolver->setDefaults([
             'data_class' => KmjUserInterface::class,
-            'event_subcriber' => null
         ]);
     }
 }

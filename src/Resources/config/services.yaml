@@ -36,3 +36,8 @@ services:
         class: Kematjaya\UserBundle\DataFixtures\UserFixtures
         tags: 
             - doctrine.fixture.orm
+            
+    Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface:
+        class: Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilder
+        tags: 
+            - kmj.user_type_subscriber

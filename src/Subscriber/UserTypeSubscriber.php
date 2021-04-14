@@ -6,6 +6,7 @@
 
 namespace Kematjaya\UserBundle\Subscriber;
 
+use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Form\FormEvent;
@@ -135,4 +136,10 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         
         return $roles;
     }
+
+    public function isSupported(string $className): bool 
+    {
+        return DefaultUser::class === $className;
+    }
+
 }

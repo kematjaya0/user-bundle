@@ -15,6 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 interface UserTypeSubscriberInterface extends EventSubscriberInterface
 {
+    const TAG_NAME = 'kmj.user_type_subscriber';
+    
+    public function isSupported(string $className):bool;
     
     public function getRoles():array;
 }
