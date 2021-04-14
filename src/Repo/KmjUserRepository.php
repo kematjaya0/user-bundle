@@ -2,9 +2,11 @@
 
 namespace Kematjaya\UserBundle\Repo;
 
+use Kematjaya\UserBundle\Entity\KmjUser;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method BaseUser|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,6 +16,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class KmjUserRepository extends ServiceEntityRepository implements KmjUserRepoInterface
 {
+    public function __construct(ManagerRegistry $registry, string $entityClass = null)
+    {
+        $entityClass = null === $entityClass ? KmjUser::class : $entityClass;
+        parent::__construct($registry, $entityClass);
+    }
+    
     public function createUser(): KmjUserInterface 
     {
         throw new \Exception(sprintf("please implement method '%s' for create object", 'createUser()'));

@@ -4,6 +4,8 @@ services:
         autoconfigure: true
         public: false
         
+    Kematjaya\UserBundle\Repo\KmjUserRepository: ~
+        
     Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
         class: Kematjaya\UserBundle\Repo\UserRepository
         
