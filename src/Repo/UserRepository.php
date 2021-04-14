@@ -8,6 +8,7 @@ namespace Kematjaya\UserBundle\Repo;
 
 use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @package Kematjaya\UserBundle\Repo

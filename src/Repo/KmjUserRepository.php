@@ -2,11 +2,9 @@
 
 namespace Kematjaya\UserBundle\Repo;
 
-use Kematjaya\UserBundle\Entity\KmjUser;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method BaseUser|null find($id, $lockMode = null, $lockVersion = null)
