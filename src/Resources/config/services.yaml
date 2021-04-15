@@ -51,5 +51,7 @@ services:
             
     Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface:
         class: Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilder
+        
+    Kematjaya\UserBundle\Subscriber\UserTypeSubscriber:
         tags: 
             - kmj.user_type_subscriber

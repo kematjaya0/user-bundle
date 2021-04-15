@@ -134,6 +134,8 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
             $roles[$role] = $role;
         }
         
+        unset($roles[DefaultUser::ROLE_USER]);
+        
         return $roles;
     }
 
