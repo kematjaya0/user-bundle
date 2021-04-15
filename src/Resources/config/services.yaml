@@ -4,11 +4,21 @@ services:
         autoconfigure: true
         public: false
         
-    Kematjaya\UserBundle\Repo\KmjUserRepository: ~
+    Kematjaya\UserBundle\Repo\KmjUserRepository:
+        class: Kematjaya\UserBundle\Repo\KmjUserRepository
+        tags: 
+            - doctrine.repository_service
+            
+    Kematjaya\UserBundle\Repo\UserRepository:
+        class: Kematjaya\UserBundle\Repo\UserRepository
+        tags: 
+            - doctrine.repository_service
         
     Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
         class: Kematjaya\UserBundle\Repo\UserRepository
-        
+        tags: 
+            - doctrine.repository_service
+            
     Kematjaya\UserBundle\Security\KmjLoginAuthenticator:
         class: Kematjaya\UserBundle\Security\KmjLoginAuthenticator
         
