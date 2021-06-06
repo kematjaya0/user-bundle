@@ -29,14 +29,12 @@ class KmjController extends AbstractKmjController
      */
     public function profile(): Response
     {
-        $config = $this->getConfigs();
+        $redirectPath = $this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles());
         
-        return $this->render(
-            '@User/security/profile.html.twig', [
+        return $this->render('@User/security/profile.html.twig', [
             'kmj_user' => $this->getUser(),
-            'title' => 'profile', 'back_path' => $config['auth_success']
-            ]
-        );
+            'title' => 'profile', 'back_path' => $redirectPath
+        ]);
     }
     
     /**
@@ -60,16 +58,17 @@ class KmjController extends AbstractKmjController
             ResetPasswordType::class, $userReset
         );
         
-        $config = $this->getConfigs();
+        $redirectPath = $this->getRoutingConfiguration()->getResetPasswordRedirectPath($this->getUser()->getRoles());
         $object = parent::processForm($request, $form);
         if ($object) {
-            return $this->redirectToRoute($config['reset_password_redirect_path']);
+            
+            return $this->redirectToRoute($redirectPath);
         }
         
         return $this->render(
             '@User/security/reset-password.html.twig', [
             'data' => $user, 'form' => $form->createView(),
-            'title' => 'reset_password',  'back_path' => $config['reset_password_redirect_path']
+            'title' => 'reset_password',  'back_path' => $redirectPath
             ]
         );
     }

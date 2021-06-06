@@ -2,6 +2,7 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Kematjaya\UserBundle\Form\LoginType;
 use Kematjaya\UserBundle\Exception\UserNotFoundException;
 use Kematjaya\UserBundle\Entity\ClientChangePassword;
@@ -26,10 +27,12 @@ class KmjSecurityController extends AbstractKmjController
      */
     protected $userRepo;
     
-    public function __construct(AuthenticationUtils $authenticationUtils, KmjUserRepoInterface $userRepo) 
+    public function __construct(RoutingConfigurationFactoryInterface $routingConfigurationFactory, AuthenticationUtils $authenticationUtils, KmjUserRepoInterface $userRepo) 
     {
         $this->authenticationUtils = $authenticationUtils;
         $this->userRepo = $userRepo;
+        
+        parent::__construct($routingConfigurationFactory);
     }
     
     /**
@@ -42,7 +45,7 @@ class KmjSecurityController extends AbstractKmjController
         if ($this->getUser()) {
             $this->addFlash("info", 'wellcome back : '. $this->getUser()->getUsername());
             
-            return $this->redirectToRoute($this->getRedirectPath());
+            return $this->redirectToRoute($this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles()));
         }
 
         $error = $this->authenticationUtils->getLastAuthenticationError();
@@ -57,24 +60,6 @@ class KmjSecurityController extends AbstractKmjController
             'error' => $error,
             'form' => $form->createView()
         ]);
-    }
-
-    protected function getRedirectPath():string
-    {
-        $config = $this->getConfigs();
-        $redirect = isset($config['auth_success']) ? $config['auth_success'] : null;
-        if (null !== $redirect) {
-            
-            return $redirect;
-        }  
-        
-        $redirects = $config['login_success'];
-        if (empty($redirects['roles'])) {
-            
-            return $redirects['default'];
-        }
-        
-        dump($this->getUser()->getRoles());exit; 
     }
     
     public function logout()
@@ -92,10 +77,9 @@ class KmjSecurityController extends AbstractKmjController
     public function changePassword(Request $request) : Response
     {
         if (!$this->getUser()) {
+            
             return $this->redirectToRoute('kmj_user_logout');
         }
-        
-        $config = $this->getConfigs();
         
         $user = $this->userRepo->find($this->getUser()->getId());
         if (!$user) {
@@ -105,14 +89,16 @@ class KmjSecurityController extends AbstractKmjController
         $form = $this->createForm(ChangePasswordType::class, new ClientChangePassword($user), ["action" => $this->generateUrl("kmj_user_change_password")]);
         $object = parent::processForm($request, $form);
         if ($object) {
-            return $this->redirectToRoute($config['auth_success']);
+            $redirect = $this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles());
+            
+            return $this->redirectToRoute($redirect);
         }
         
         return $this->render(
             '@User/security/change_password.html.twig', array(
             'title' => 'change_password',
             'form' => $form->createView(),
-            'back_path' => $config['auth_success']
+            'back_path' => $redirect
             )
         );
     }

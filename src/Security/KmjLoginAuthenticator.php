@@ -4,6 +4,7 @@ namespace Kematjaya\UserBundle\Security;
 
 use Kematjaya\UserBundle\Form\LoginType;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
+use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -71,16 +72,21 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
      * @var string
      */
     private $error;
-    
-    private $authSuccessRoute;
 
+    /**
+     * 
+     * @var RoutingConfigurationFactoryInterface
+     */
+    private $routingConfigurationFactory;
+    
     public function __construct(
         ContainerBagInterface $containerBag,
         ContainerInterface $container,
         KmjUserRepoInterface $kmjUserRepo, 
         UrlGeneratorInterface $urlGenerator, 
         CsrfTokenManagerInterface $csrfTokenManager, 
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+            RoutingConfigurationFactoryInterface $routingConfigurationFactory
     ) {
         $this->container = $container;
         $this->config = $containerBag->get('user');
@@ -89,7 +95,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
         $this->loginRoute = $this->config['route']['login'];
-        $this->authSuccessRoute = $this->config['route']['auth_success'];
+        $this->routingConfigurationFactory = $routingConfigurationFactory;
     }
 
     public function supports(Request $request)
@@ -147,13 +153,15 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $this->saveTargetPath($request->getSession(), $providerKey, $this->urlGenerator->generate($this->authSuccessRoute));
-        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
+        $redirectPath = $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getUser()->getRoles());
+        $this->saveTargetPath($request->getSession(), $providerKey, $this->urlGenerator->generate($redirectPath));
+        $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
+        if ($targetPath) {
+            
             return new RedirectResponse($targetPath);
         }
 
-        // For example : return new RedirectResponse($this->urlGenerator->generate('some_route'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        throw new RedirectResponse('homepage');
     }
 
     protected function getLoginUrl()

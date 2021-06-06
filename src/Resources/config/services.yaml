@@ -55,3 +55,6 @@ services:
     Kematjaya\UserBundle\Subscriber\UserTypeSubscriber:
         tags: 
             - kmj.user_type_subscriber
+            
+    Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface:
+        class: Kematjaya\UserBundle\Config\RoutingConfigurationFactory

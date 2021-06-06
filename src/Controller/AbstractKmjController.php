@@ -6,6 +6,7 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,19 +21,30 @@ use Exception;
 class AbstractKmjController extends AbstractController
 {
     /**
+     * 
+     * @var RoutingConfigurationFactoryInterface
+     */
+    private $routingConfigurationFactory;
+    
+    public function __construct(RoutingConfigurationFactoryInterface $routingConfigurationFactory)
+    {
+        $this->routingConfigurationFactory = $routingConfigurationFactory;
+    }
+    
+    /**
      * Get array configurations
      * 
      * @return type
      * @throws Exception
      */
-    protected function getConfigs()
+    protected function getRoutingConfiguration()
     {
         $config = $this->container->getParameter('user');
         if(!isset($config['route']['auth_success'])) {
             throw new \Exception("please set router.auth_succes key under kmj_user config");
         }
         
-        return $config['route'];
+        return $this->routingConfigurationFactory;
     }
     
     /**
