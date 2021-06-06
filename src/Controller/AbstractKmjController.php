@@ -34,16 +34,10 @@ class AbstractKmjController extends AbstractController
     /**
      * Get array configurations
      * 
-     * @return type
-     * @throws Exception
+     * @return RoutingConfigurationFactoryInterface
      */
     protected function getRoutingConfiguration()
     {
-        $config = $this->container->getParameter('user');
-        if(!isset($config['route']['auth_success'])) {
-            throw new \Exception("please set router.auth_succes key under kmj_user config");
-        }
-        
         return $this->routingConfigurationFactory;
     }
     
