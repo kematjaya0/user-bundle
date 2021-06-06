@@ -19,7 +19,7 @@ class UserExtension extends Extension
         $loader->load('services.yaml');
         
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);dump($config);exit;
         $container->setParameter($this->getAlias(), $config);
         
     }

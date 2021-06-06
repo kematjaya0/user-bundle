@@ -28,8 +28,14 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('route')->addDefaultsIfNotSet()
                 ->children()
                     ->scalarNode('login')->defaultValue('kmj_user_login')->end()
-                    ->scalarNode('auth_success')->defaultValue('homepage')->end()
+                    ->scalarNode('auth_success')->setDeprecated()->end()
                     ->scalarNode('reset_password_redirect_path')->defaultValue('homepage')->end()
+                    ->arrayNode('login_success')->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('default')->defaultValue('homepage')->end()
+                            ->arrayNode('roles')->addDefaultsIfNotSet()->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
     }

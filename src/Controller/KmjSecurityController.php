@@ -40,10 +40,9 @@ class KmjSecurityController extends AbstractKmjController
     public function login(): Response
     {
         if ($this->getUser()) {
-            $config = $this->getConfigs();
-            
             $this->addFlash("info", 'wellcome back : '. $this->getUser()->getUsername());
-            return $this->redirectToRoute($config['auth_success']);
+            
+            return $this->redirectToRoute($this->getRedirectPath());
         }
 
         $error = $this->authenticationUtils->getLastAuthenticationError();
@@ -60,6 +59,24 @@ class KmjSecurityController extends AbstractKmjController
         ]);
     }
 
+    protected function getRedirectPath():string
+    {
+        $config = $this->getConfigs();
+        $redirect = isset($config['auth_success']) ? $config['auth_success'] : null;
+        if (null !== $redirect) {
+            
+            return $redirect;
+        }  
+        
+        $redirects = $config['login_success'];
+        if (empty($redirects['roles'])) {
+            
+            return $redirects['default'];
+        }
+        
+        dump($this->getUser()->getRoles());exit; 
+    }
+    
     public function logout()
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
