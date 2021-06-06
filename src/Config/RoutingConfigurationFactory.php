@@ -23,7 +23,8 @@ class RoutingConfigurationFactory implements RoutingConfigurationFactoryInterfac
     
     public function __construct(ParameterBagInterface $parameterBag) 
     {
-        $this->configs = $parameterBag->get('user');
+        $configs = $parameterBag->get('user');
+        $this->configs = $configs['route'];
     }
     
     public function getLoginSuccessRedirectPath(array $roles):string
