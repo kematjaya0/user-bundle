@@ -86,10 +86,10 @@ class KmjSecurityController extends AbstractKmjController
             throw new UserNotFoundException($this->getUser()->getId());
         }
         
+        $redirect = $this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles());
         $form = $this->createForm(ChangePasswordType::class, new ClientChangePassword($user), ["action" => $this->generateUrl("kmj_user_change_password")]);
         $object = parent::processForm($request, $form);
         if ($object) {
-            $redirect = $this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles());
             
             return $this->redirectToRoute($redirect);
         }
