@@ -18,5 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class DefaultUser extends KmjUser
 {
-    
+    public function getUserIdentifier()
+    {
+        return $this->getUsername();
+    }
 }
