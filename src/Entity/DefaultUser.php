@@ -32,7 +32,9 @@ class DefaultUser extends KmjUser
     
     public function getSingleRole(): string 
     {
-        return $this->single_role;
+        $roles = $this->getRoles();
+        
+        return end($roles);
     }
 
     public function setSingleRole(string $single_role):self
