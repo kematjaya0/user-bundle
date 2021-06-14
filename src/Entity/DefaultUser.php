@@ -18,8 +18,31 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class DefaultUser extends KmjUser
 {
+    
+    /**
+     * 
+     * @var string
+     */
+    private $single_role;
+    
     public function getUserIdentifier()
     {
         return $this->getUsername();
     }
+    
+    public function getSingleRole(): string 
+    {
+        return $this->single_role;
+    }
+
+    public function setSingleRole(string $single_role):self
+    {
+        $this->single_role = $single_role;
+        
+        $this->setRoles([$single_role]);
+        
+        return $this;
+    }
+
+
 }

@@ -31,7 +31,6 @@ class KmjUserType extends AbstractType
         $builder
             ->add('username')
             ->add('name')
-            ->add('roles')
             ->add('is_active');
         
         $className = get_class($builder->getData());

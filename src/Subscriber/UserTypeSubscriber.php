@@ -78,10 +78,9 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
                 'label' => 'username',
                 'attr' => ['readonly' => (bool) $data->getId()]
             ])
-            ->add('roles', ChoiceType::class, [
+            ->add('single_role', ChoiceType::class, [
                 'label' =>'roles',
-                'choices' => $this->getRoles(),
-                'multiple'  => true
+                'choices' => $this->getRoles()
             ])
             ->add('is_active', CheckboxType::class, [
                 'label' => 'is_active'
