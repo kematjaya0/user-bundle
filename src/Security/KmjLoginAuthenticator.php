@@ -9,7 +9,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+//use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -55,7 +56,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
     
     /**
      * 
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordHasherInterface
      */
     private $passwordEncoder;
     
@@ -85,7 +86,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         KmjUserRepoInterface $kmjUserRepo, 
         UrlGeneratorInterface $urlGenerator, 
         CsrfTokenManagerInterface $csrfTokenManager, 
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserPasswordHasherInterface $passwordEncoder,
             RoutingConfigurationFactoryInterface $routingConfigurationFactory
     ) {
         $this->container = $container;

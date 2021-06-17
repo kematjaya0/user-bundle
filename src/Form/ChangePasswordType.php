@@ -16,25 +16,25 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 
 class ChangePasswordType extends AbstractType
 {
     /**
      * 
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
     private $encoderFactory;
     
     /**
      * 
-     * @var UserPasswordEncoderInterface
+     * @var UserPasswordHasherInterface
      */
     private $passwordEncoder;
     
-    public function __construct(EncoderFactoryInterface $encoderFactory, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(PasswordHasherFactoryInterface $encoderFactory, UserPasswordHasherInterface $passwordEncoder)
     { 
         $this->encoderFactory = $encoderFactory;
         $this->passwordEncoder = $passwordEncoder;
@@ -79,9 +79,8 @@ class ChangePasswordType extends AbstractType
                     return;
                 }
                 
-                $encoder = $this->encoderFactory->getEncoder($data->getUser());
-                $password = $encoder->encodePassword($data->getPasswordNew(), $data->getUser()->getSalt());
-                $data->getUser()->setPassword($password);
+                $encoder = $this->encoderFactory->getPasswordHasher($data->getUser());
+                $data->getUser()->setPassword($encoder->hash($data->getPasswordNew()));
                 $event->setData($data);
             }
         );
