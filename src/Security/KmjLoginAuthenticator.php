@@ -23,6 +23,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
 
+/**
+ * @deprecated since version 4.2.0, use Kematjaya\UserBundle\Security\FormLoginAuthenticator instead
+ */
 class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
 {
     use TargetPathTrait;

@@ -13,30 +13,36 @@
    user:
         route:
             login: kmj_user_login
-            auth_success: path if login success
+            login_success: 
+                ## ----- default redirect page ----
+                default: dashboard_index
+                ## ----- if multiple redirect ----
+                roles: 
+                    - { role: ROLE_USER, path: homepage }
+                    - { role: ROLE_SUPER_USER, path: backend_dashboard }
    ```
 4. update config/packages/security.yml
    ```
    security:
-       role_hierarchy:
-           # kmj_user default rule is (ROLE_SUPER_USER, ROLE_ADMINISTRATOR, ROLE_USER)
-           ROLE_ADMINISTRATOR: ROLE_USER
-           ROLE_SUPER_USER: ROLE_ADMINISTRATOR
-       encoders:
-           Kematjaya\UserBundle\Entity\KmjUser:
-              algorithm: auto
-       providers:
-           app_user_provider:
-               entity:
+        role_hierarchy:
+            # kmj_user default rule is (ROLE_SUPER_USER, ROLE_ADMINISTRATOR, ROLE_USER)
+            ROLE_ADMINISTRATOR: ROLE_USER
+            ROLE_SUPER_USER: ROLE_ADMINISTRATOR
+        encoders:
+            Kematjaya\UserBundle\Entity\KmjUser:
+                algorithm: auto
+        enable_authenticator_manager: true
+        providers:
+            app_user_provider:
+                entity:
                     class: Kematjaya\UserBundle\Entity\KmjUser
                     property: username
-       firewalls:
-           main:
-               logout: 
-                   path: kmj_user_logout
-               guard:
-                   authenticators:
-                       - Kematjaya\UserBundle\Security\KmjLoginAuthenticator
+        firewalls:
+            main:
+                logout: 
+                    path: kmj_user_logout
+                custom_authenticators:
+                    - Kematjaya\UserBundle\Security\FormLoginAuthenticator
    ```
 5. import route, update file config/routes/annotations.yaml
    ```
