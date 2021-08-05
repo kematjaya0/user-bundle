@@ -72,19 +72,29 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
     {
         $data = $event->getData();
         $form = $event->getForm();
-
+        
         $form
             ->add('username', TextType::class, [
                 'label' => 'username',
                 'attr' => ['readonly' => (bool) $data->getId()]
             ])
-            ->add('single_role', ChoiceType::class, [
-                'label' =>'roles',
-                'choices' => $this->getRoles()
-            ])
             ->add('is_active', CheckboxType::class, [
                 'label' => 'is_active'
+            ])
+            ->add('roles', ChoiceType::class, [
+                'label' =>'roles',
+                'multiple'  => true,
+                'choices' => $this->getRoles()
             ]);
+        
+        if ($data instanceof DefaultUser) {
+            $form
+                ->remove('roles')
+                ->add('single_role', ChoiceType::class, [
+                'label' =>'roles',
+                'choices' => $this->getRoles()
+            ]);
+        }
         
         if (null === $data->getId()) {
             $form->add('password', PasswordType::class, [
@@ -140,7 +150,9 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
 
     public function isSupported(string $className): bool 
     {
-        return DefaultUser::class === $className;
+        $refflection = new \ReflectionClass($className);
+        
+        return $refflection->implementsInterface(KmjUserInterface::class);
     }
 
 }
