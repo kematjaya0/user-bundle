@@ -7,7 +7,7 @@ use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
@@ -15,9 +15,13 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
 {
     private $kmjUserRepo;
     
+    /**
+     * 
+     * @var PasswordHasherFactoryInterface
+     */
     private $encoderFactory;
     
-    public function __construct(KmjUserRepoInterface $kmjUserRepo, EncoderFactoryInterface $encoderFactory) 
+    public function __construct(KmjUserRepoInterface $kmjUserRepo, PasswordHasherFactoryInterface $encoderFactory) 
     {
         $this->kmjUserRepo = $kmjUserRepo;
         $this->encoderFactory = $encoderFactory;
@@ -31,16 +35,14 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
         ];
         
         $i = 1;
-        foreach($arr as $role => $users)
-        {
-            foreach($users as $username)
-            {
+        foreach ($arr as $role => $users) {
+            foreach ($users as $username) {
                 $user = $this->kmjUserRepo->createUser();
                 $user->setUsername($username);
                 $user->setName(strtoupper($username));
                 $user->setIsActive(true);
-                $encoder = $this->encoderFactory->getEncoder($user);
-                $password = $encoder->encodePassword('admin123', $user->getUsername());
+                $encoder = $this->encoderFactory->getPasswordHasher($user);
+                $password = $encoder->hash('admin123');
                 $user->setPassword($password);
                 $user->setRoles([$role]);
                 $manager->persist($user);

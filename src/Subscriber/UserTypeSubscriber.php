@@ -15,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 
@@ -29,7 +29,7 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
     
     /**
      * 
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
     private $encoderFactory;
     
@@ -51,7 +51,7 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
      */
     private $repo;
     
-    public function __construct(KmjUserRepoInterface $repo, TokenStorageInterface $token, EncoderFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy)
+    public function __construct(KmjUserRepoInterface $repo, TokenStorageInterface $token, PasswordHasherFactoryInterface $encoderFactory, RoleHierarchyInterface $roleHierarchy)
     { 
         $this->encoderFactory = $encoderFactory;
         $this->tokenStorage = $token;
@@ -115,8 +115,8 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
             return;
         }
         
-        $encoder = $this->encoderFactory->getEncoder($data);
-        $password = $encoder->encodePassword($data->getPassword(), $data->getSalt());
+        $encoder = $this->encoderFactory->getPasswordHasher($data);
+        $password = $encoder->hash($data->getPassword());
         
         $data->setPassword($password);
         $event->setData($data);

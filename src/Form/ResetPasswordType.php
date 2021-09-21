@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * @package Kematjaya\UserBundle\Form
@@ -25,11 +25,11 @@ class ResetPasswordType extends AbstractType
 {
     /**
      * 
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
     private $encoderFactory;
     
-    public function __construct(EncoderFactoryInterface $encoderFactory) 
+    public function __construct(PasswordHasherFactoryInterface $encoderFactory) 
     {
         $this->encoderFactory = $encoderFactory;
     }
@@ -70,8 +70,9 @@ class ResetPasswordType extends AbstractType
                 }
             
                 $user = $data->getUser();
-                $encoder = $this->encoderFactory->getEncoder($user);
-                $password = $encoder->encodePassword($user->getPassword(), $user->getUsername());
+                $encoder = $this->encoderFactory->getPasswordHasher($user);
+                $password = $encoder->hash($user->getPassword());
+                
                 $data->setPassword($password);
                 $data->setRetypePassword($password);
             
