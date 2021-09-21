@@ -14,6 +14,14 @@ services:
         class: Symfony\Component\Security\Core\Encoder\EncoderFactory
         arguments: 
             - []
+    
+    Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface:
+        class: Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory
+        arguments: 
+            - []
+            
+    Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
+        class: Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
             
     Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface:
         class: Symfony\Component\Security\Core\Encoder\UserPasswordEncoder
