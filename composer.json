@@ -22,7 +22,8 @@
         "doctrine/doctrine-bundle": "^2.3",
         "doctrine/orm": "^2.8",
         "symfony/uid": "^5.3",
-        "symfony/doctrine-bridge": "^5.3"
+        "symfony/doctrine-bridge": "^5.3",
+        "symfony/security-core": "^5.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
