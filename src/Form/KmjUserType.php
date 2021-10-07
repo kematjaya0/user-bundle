@@ -30,10 +30,18 @@ class KmjUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('username')
-            ->add('name')
-            ->add('roles')
-            ->add('is_active');
+            ->add('username', null, [
+                'label' => 'username'
+            ])
+            ->add('name', null, [
+                'label' => 'name'
+            ])
+            ->add('roles', null, [
+                'label' => 'roles'
+            ])
+            ->add('is_active', null, [
+                'label' => 'is_active'
+            ]);
         
         $builder->addEventSubscriber($this->userTypeSubscriber);
         
