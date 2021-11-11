@@ -7,7 +7,11 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+
+trigger_deprecation('kematjaya/user-bundle', '4.3', 'The "%s" class is deprecated, use "%s" instead.', BaseVoter::class, 'kematjaya/security-annotation-bundle');
+
 /**
+ * @deprecated since version 4.3, use kematjaya/security-annotation-bundle instead
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 abstract class BaseVoter extends Voter
