@@ -1,1 +1,1 @@
-{"version":1,"defects":[],"times":{"Kematjaya\\UserBundle\\Tests\\BundleTest::testInitBundle":0.522}}
+{"version":1,"defects":{"Kematjaya\\UserBundle\\Tests\\BundleTest::testInitBundle":4},"times":{"Kematjaya\\UserBundle\\Tests\\BundleTest::testInitBundle":0.75}}

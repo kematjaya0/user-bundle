@@ -18,6 +18,12 @@ services:
     Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface:
         class: Symfony\Component\Security\Core\Encoder\UserPasswordEncoder
         
+    Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface:
+        class: Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher
+        
+    Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
+        class: Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
+        
     Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface:
         class: Kematjaya\UserBundle\Tests\Util\TokenStorage
         
