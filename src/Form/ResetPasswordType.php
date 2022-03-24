@@ -37,27 +37,20 @@ class ResetPasswordType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                'username', TextType::class, [
-                    'label' => 'username',
-                    'attr' => ['readonly' => true]
-                    ]
-            )
-            ->add(
-                'password', PasswordType::class, [
-                    'label' => 'password',
-                    'required' => true
-                    ]
-            )
-            ->add(
-                'retype_password', PasswordType::class, [
-                    'label' => 'retype_password',
-                    'required' => true
-                    ]
-            );
+            ->add('username', TextType::class, [
+                'label' => 'username',
+                'attr' => ['readonly' => true]
+            ])
+            ->add('password', PasswordType::class, [
+                'label' => 'password',
+                'required' => true
+            ])
+            ->add('retype_password', PasswordType::class, [
+                'label' => 'retype_password',
+                'required' => true
+            ]);
         
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $data = $event->getData();
                 if(!$data instanceof ResettingPassword) {
                     return;
@@ -74,7 +67,6 @@ class ResetPasswordType extends AbstractType
                 $user = $data->getUser();
                 $encoder = $this->encoderFactory->getPasswordHasher($user);
                 $data->setPassword($encoder->hash($user->getPassword()));
-                $data->setRetypePassword($password);
             
                 $event->setData($data);
             }
@@ -83,10 +75,8 @@ class ResetPasswordType extends AbstractType
     
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
+        $resolver->setDefaults([
             'data_class' => ResettingPassword::class
-            ]
-        );
+        ]);
     }
 }

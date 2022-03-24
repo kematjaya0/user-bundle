@@ -26,18 +26,18 @@ class ChangePasswordType extends AbstractType
      * 
      * @var PasswordHasherFactoryInterface
      */
-    private $encoderFactory;
+    private $passwordHasherFactory;
     
     /**
      * 
      * @var UserPasswordHasherInterface
      */
-    private $passwordEncoder;
+    private $userPasswordHasher;
     
-    public function __construct(PasswordHasherFactoryInterface $encoderFactory, UserPasswordHasherInterface $passwordEncoder)
+    public function __construct(PasswordHasherFactoryInterface $passwordHasherFactory, UserPasswordHasherInterface $userPasswordHasher)
     { 
-        $this->encoderFactory = $encoderFactory;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->passwordHasherFactory = $passwordHasherFactory;
+        $this->userPasswordHasher = $userPasswordHasher;
     }
     
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -67,7 +67,7 @@ class ChangePasswordType extends AbstractType
                 $data = $event->getData();
                 $form = $event->getForm();
             
-                if (!$this->passwordEncoder->isPasswordValid($data->getUser(), $data->getPasswordOld())) {
+                if (!$this->userPasswordHasher->isPasswordValid($data->getUser(), $data->getPasswordOld())) {
                     $form->get("password_old")->addError(new FormError("old password is wrong! "));
                 
                     return;
@@ -79,7 +79,7 @@ class ChangePasswordType extends AbstractType
                     return;
                 }
                 
-                $encoder = $this->encoderFactory->getPasswordHasher($data->getUser());
+                $encoder = $this->passwordHasherFactory->getPasswordHasher($data->getUser());
                 $data->getUser()->setPassword($encoder->hash($data->getPasswordNew()));
                 $event->setData($data);
             }
