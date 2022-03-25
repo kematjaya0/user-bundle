@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * Description of UnauthorizedEventListener
@@ -47,7 +48,12 @@ class UnauthorizedEventListener
         $response = new RedirectResponse(
             $this->urlGenerator->generate("kmj_user_login")
         );
-        
+        $response->headers->setCookie(
+            Cookie::create(
+                "redirect_path", 
+                $event->getRequest()->attributes->get("_route")
+            )
+        );
         $event->setResponse($response);
     }
 }

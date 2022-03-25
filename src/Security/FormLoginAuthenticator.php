@@ -11,6 +11,7 @@ use Kematjaya\UserBundle\Form\LoginType;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -121,11 +122,17 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response 
     {
-        $targetPath = $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getRoleNames());
-        
-        return new RedirectResponse(
+        $targetPath = $request->cookies->has("redirect_path") ? $request->cookies->get("redirect_path") : $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getRoleNames());
+        $response = new RedirectResponse(
             $this->urlGenerator->generate($targetPath)
         );
+        if ($request->cookies->has("redirect_path")) {
+            $response->headers->setCookie(
+                Cookie::create("redirect_path", null)
+            );
+        }
+        
+        return $response;
     }
 
     public function supports(Request $request): ?bool 
