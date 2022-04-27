@@ -48,10 +48,17 @@ class UnauthorizedEventListener
         $response = new RedirectResponse(
             $this->urlGenerator->generate("kmj_user_login")
         );
+        
+        $url = $this->urlGenerator->generate(
+            $event->getRequest()->attributes->get("_route"),
+            $event->getRequest()->attributes->get("_route_params"),
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        
         $response->headers->setCookie(
             Cookie::create(
                 "redirect_path", 
-                $event->getRequest()->attributes->get("_route")
+                $url
             )
         );
         $event->setResponse($response);

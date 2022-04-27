@@ -122,9 +122,12 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response 
     {
-        $targetPath = $request->cookies->has("redirect_path") ? $request->cookies->get("redirect_path") : $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getRoleNames());
+        $defaultUrl = $this->urlGenerator->generate(
+            $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getRoleNames())
+        );
+        $targetPath = $request->cookies->has("redirect_path") ? $request->cookies->get("redirect_path") : $defaultUrl;
         $response = new RedirectResponse(
-            $this->urlGenerator->generate($targetPath)
+            $targetPath
         );
         if ($request->cookies->has("redirect_path")) {
             $response->headers->setCookie(
