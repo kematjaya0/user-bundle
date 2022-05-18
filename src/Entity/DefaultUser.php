@@ -25,6 +25,10 @@ class DefaultUser extends KmjUser
      */
     private $single_role;
     
+    /**
+     * 
+     * @return string
+     */
     public function getUserIdentifier()
     {
         return $this->getUsername();

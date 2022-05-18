@@ -6,6 +6,7 @@ use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Table(name="kmj_user")
@@ -13,7 +14,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class KmjUser implements KmjUserInterface, PasswordAuthenticatedUserInterface
+abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -119,9 +120,10 @@ abstract class KmjUser implements KmjUserInterface, PasswordAuthenticatedUserInt
     }
     
     /**
+     * @return string|null
      * @see UserInterface
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return $this->getUsername();
     }
