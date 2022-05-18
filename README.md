@@ -28,9 +28,8 @@
             # kmj_user default rule is (ROLE_SUPER_USER, ROLE_ADMINISTRATOR, ROLE_USER)
             ROLE_ADMINISTRATOR: ROLE_USER
             ROLE_SUPER_USER: ROLE_ADMINISTRATOR
-        encoders:
-            Kematjaya\UserBundle\Entity\KmjUser:
-                algorithm: auto
+        password_hashers:
+            Kematjaya\UserBundle\Entity\KmjUser: auto
         enable_authenticator_manager: true
         providers:
             app_user_provider:
@@ -49,13 +48,45 @@
    kmj_user:
     resource: '@UserBundle/Resources/config/routing/all.xml'
    ```
-6. for insert demo user, then run on command :
+6. create entity
+   ```
+   // src/Entity/MyUser.php
+   ..
+   use Kematjaya\UserBundle\Entity\DefaultUser;
+   ...
+   
+   class MyUser extends DefaultUser 
+   {
+        /**
+        * @ORM\Column(type="string", length=255, nullable=true)
+        */
+        private $email;
+
+        public function getEmail(): ?string
+        {
+            return $this->email;
+        }
+
+        public function setEmail(?string $email): self
+        {
+            $this->email = $email;
+
+            return $this;
+        }
+   }
+   ```
+7. update schema:
+   ```
+   php bin/console doctrine:schema:update --force
+   ```
+8. for insert demo user, then run on command :
    ```
    php bin/console doctrine:fixtures:load
    ```
    then, use root and admin for login and password: admin123
-7. other route :
+9. other route :
    ```
+   {{ path('kmj_user_user') }}
    {{ path('kmj_user_profile') }} // for profile user
    {{ path('kmj_user_change_password') }} // for open change password form
    {{ path('kmj_user_logout') }} // for logout 
