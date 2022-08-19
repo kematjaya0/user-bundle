@@ -5,7 +5,7 @@ namespace Kematjaya\UserBundle\Entity;
 use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+//use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterfac
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface, PasswordAuthenticatedUserInterface
+abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface//, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
