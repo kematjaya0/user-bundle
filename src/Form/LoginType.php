@@ -50,6 +50,10 @@ class LoginType extends AbstractType
         }
     }
     
+    /**
+     * 
+     * @return string
+     */
     public function getBlockPrefix() 
     {
         return self::NAME;

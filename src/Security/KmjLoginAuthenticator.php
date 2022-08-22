@@ -7,6 +7,7 @@ use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -101,12 +102,17 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         $this->routingConfigurationFactory = $routingConfigurationFactory;
     }
 
-    public function supports(Request $request)
+    public function supports(Request $request):bool
     {
         return $this->loginRoute === $request->attributes->get('_route')
             && $request->isMethod(Request::METHOD_POST);
     }
 
+    /**
+     * 
+     * @param Request $request
+     * @return mixed
+     */
     public function getCredentials(Request $request)
     {
         $form = $this->createForm(LoginType::class);
@@ -126,7 +132,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         return $credentials;
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser($credentials, UserProviderInterface $userProvider):?UserInterface
     {
         if (null !== $this->error) {
             throw new CustomUserMessageAuthenticationException($this->error);
@@ -141,7 +147,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         return $user;
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials($credentials, UserInterface $user):bool
     {
         return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
     }
@@ -154,7 +160,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         return $credentials['password'];
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey):?Response
     {
         $redirectPath = $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getUser()->getRoles());
         $this->saveTargetPath($request->getSession(), $providerKey, $this->urlGenerator->generate($redirectPath));
@@ -167,7 +173,7 @@ class KmjLoginAuthenticator extends AbstractFormLoginAuthenticator implements Pa
         throw new RedirectResponse('homepage');
     }
 
-    protected function getLoginUrl()
+    protected function getLoginUrl():string
     {
         return $this->urlGenerator->generate($this->loginRoute);
     }

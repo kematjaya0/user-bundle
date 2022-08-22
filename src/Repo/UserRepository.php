@@ -9,6 +9,7 @@ namespace Kematjaya\UserBundle\Repo;
 use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -44,7 +45,7 @@ class UserRepository extends KmjUserRepository
         return new DefaultUser();
     }
     
-    public function createQueryBuilder($alias, $indexBy = null) 
+    public function createQueryBuilder($alias, $indexBy = null):QueryBuilder 
     {
         $qb = parent::createQueryBuilder($alias, $indexBy);
         $user = $this->getUser();
