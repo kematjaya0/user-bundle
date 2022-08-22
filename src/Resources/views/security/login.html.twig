@@ -29,9 +29,11 @@
                 {{ form_widget(form.password, {attr: {class: "form-control", placeholder: "password"|trans }}) }}
               <span class="glyphicon glyphicon-lock form-control-feedback"></span>
             </div>
+            {% if form.captcha is defined %}
             <div class="form-group has-feedback">
                 {{ form_widget(form.captcha, {attr: {class: "form-control", placeholder: "captcha"|trans }}) }}
             </div>
+            {% endif %}
             <div class="row">
                 <div class="col-xs-8">
                     <!--<div class="checkbox icheck">
