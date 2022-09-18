@@ -91,3 +91,12 @@
    {{ path('kmj_user_change_password') }} // for open change password form
    {{ path('kmj_user_logout') }} // for logout 
    ```
+10, password form theme:
+    ```
+twig:
+    form_themes:
+        ## .... for bootstrap 3
+        - '@User/form/bootstrap_3_password.html.twig'
+        ## .... for bootstrap 4
+        - '@User/form/bootstrap_4_password.html.twig'
+    ```
