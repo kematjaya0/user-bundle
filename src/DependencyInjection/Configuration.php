@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('use_captcha')->defaultTrue()->end()
             ->arrayNode('route')->addDefaultsIfNotSet()
                 ->children()
+                    ->scalarNode('unauthorize_redirect_path')->defaultValue('kmj_user_login')->end()
                     ->scalarNode('login')->defaultValue('kmj_user_login')->end()
                     ->arrayNode('login_success')->addDefaultsIfNotSet()
                         ->children()

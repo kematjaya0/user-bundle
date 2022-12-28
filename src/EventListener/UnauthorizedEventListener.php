@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Description of UnauthorizedEventListener
@@ -26,9 +27,16 @@ class UnauthorizedEventListener
      */
     private $urlGenerator;
     
-    public function __construct(UrlGeneratorInterface $urlGenerator) 
+    /**
+     * 
+     * @var ParameterBagInterface
+     */
+    private $parameterBag;
+    
+    public function __construct(UrlGeneratorInterface $urlGenerator, ParameterBagInterface $parameterBag) 
     {
         $this->urlGenerator = $urlGenerator;
+        $this->parameterBag = $parameterBag;
     }
     
     public function onKernelException(ExceptionEvent $event)
@@ -44,9 +52,11 @@ class UnauthorizedEventListener
     
     protected function createResponse(ExceptionEvent $event)
     {
+        $configs = $this->parameterBag->get("user");
         $event->getRequest()->getSession()->getFlashBag()->add("error", $event->getThrowable()->getMessage());
+        $redirectPath = $configs['route']['unauthorize_redirect_path'];
         $response = new RedirectResponse(
-            $this->urlGenerator->generate("kmj_user_login")
+            $this->urlGenerator->generate($redirectPath)
         );
         
         $url = $this->urlGenerator->generate(
