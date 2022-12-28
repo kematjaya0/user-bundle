@@ -140,7 +140,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): ?bool 
     {
-        return Request::METHOD_POST === $request->getMethod();
+        return "kmj_user_login" === $request->attributes->get("_route") && Request::METHOD_POST === $request->getMethod();
     }
     
     protected function createForm(string $className, $data = null): FormInterface
