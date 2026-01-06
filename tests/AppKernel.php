@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class AppKernel extends Kernel 
 {
-    public function registerBundles()
+    public function registerBundles():iterable
     {
         return [
             new \Kematjaya\UserBundle\UserBundle(),

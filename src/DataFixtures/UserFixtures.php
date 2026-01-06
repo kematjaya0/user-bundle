@@ -14,17 +14,9 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 class UserFixtures extends Fixture implements FixtureGroupInterface
 {
     
-    /**
-     * 
-     * @var KmjUserRepoInterface
-     */
-    private $kmjUserRepo;
-    
-    /**
-     * 
-     * @var PasswordHasherFactoryInterface
-     */
-    private $encoderFactory;
+    private KmjUserRepoInterface $kmjUserRepo;
+
+    private PasswordHasherFactoryInterface $encoderFactory;
     
     public function __construct(KmjUserRepoInterface $kmjUserRepo, PasswordHasherFactoryInterface $encoderFactory) 
     {
@@ -32,7 +24,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
         $this->encoderFactory = $encoderFactory;
     }
     
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager):void
     {
         $arr = [
             KmjUserInterface::ROLE_SUPER_USER => ['root'], 

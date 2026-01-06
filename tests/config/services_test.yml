@@ -29,3 +29,6 @@ services:
         
     Symfony\Component\Security\Core\Role\RoleHierarchyInterface:
         class: Kematjaya\UserBundle\Tests\Util\RoleHierarchy
+
+    Symfony\Component\Routing\Generator\UrlGeneratorInterface:
+        class: Kematjaya\UserBundle\Tests\Util\UrlGenerator

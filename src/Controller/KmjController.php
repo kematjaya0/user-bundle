@@ -1,9 +1,5 @@
 <?php
 
-/**
- * This file is part of the user-bundle.
- */
-
 namespace Kematjaya\UserBundle\Controller;
 
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;

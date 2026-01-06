@@ -21,23 +21,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class UnauthorizedEventListener 
 {
-    /**
-     * 
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
     
-    /**
-     * 
-     * @var ParameterBagInterface
-     */
-    private $parameterBag;
-    
-    public function __construct(UrlGeneratorInterface $urlGenerator, ParameterBagInterface $parameterBag) 
-    {
-        $this->urlGenerator = $urlGenerator;
-        $this->parameterBag = $parameterBag;
-    }
+    public function __construct(private UrlGeneratorInterface $urlGenerator, private ParameterBagInterface $parameterBag)
+    {}
     
     public function onKernelException(ExceptionEvent $event)
     {

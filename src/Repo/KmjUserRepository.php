@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class KmjUserRepository extends ServiceEntityRepository implements KmjUserRepoInterface
 {
-    public function __construct(ManagerRegistry $registry, string $entityClass = null)
+    public function __construct(ManagerRegistry $registry, ?string $entityClass = null)
     {
         $entityClass = null === $entityClass ? KmjUser::class : $entityClass;
         parent::__construct($registry, $entityClass);

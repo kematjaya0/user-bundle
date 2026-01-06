@@ -1,9 +1,5 @@
 <?php
 
-/**
- * This file is part of the user-bundle.
- */
-
 namespace Kematjaya\UserBundle\Repo;
 
 use Kematjaya\UserBundle\Entity\DefaultUser;
@@ -21,22 +17,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class UserRepository extends KmjUserRepository
 {
-    /**
-     * 
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-    
-    /**
-     * 
-     * @var RoleHierarchyInterface
-     */
-    private $roleHierarchy;
-    
-    public function __construct(RoleHierarchyInterface $roleHierarchy, TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
+    public function __construct(private RoleHierarchyInterface $roleHierarchy, private TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
     {
-        $this->tokenStorage = $tokenStorage;
-        $this->roleHierarchy = $roleHierarchy;
         parent::__construct($registry, DefaultUser::class);
     }
     
@@ -45,7 +27,7 @@ class UserRepository extends KmjUserRepository
         return new DefaultUser();
     }
     
-    public function createQueryBuilder($alias, $indexBy = null):QueryBuilder 
+    public function createQueryBuilder($alias, $indexBy = null):QueryBuilder
     {
         $qb = parent::createQueryBuilder($alias, $indexBy);
         $user = $this->getUser();
