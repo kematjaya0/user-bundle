@@ -48,11 +48,7 @@ class UserTypeSubscriberBuilder implements UserTypeSubscriberBuilderInterface
         });
         
         $subscriber = $subscribers->first();
-        if(!$subscriber instanceof UserTypeSubscriberInterface) {
-            
-            throw new \Exception(sprintf("subcsriber for class %s not exist", $className));
-        }
-        
-        return $subscriber;
+
+        return $subscriber instanceof UserTypeSubscriberInterface ? $subscriber : null;
     }
 }

@@ -9,6 +9,7 @@ namespace Kematjaya\UserBundle\Subscriber;
 use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
@@ -117,8 +118,7 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         }
         
         $data->setUsername(trim($data->getUsername()));
-        $other = $this->repo->findOneByUsernameAndActive($data->getUsername());
-        if ($other) {
+        if ($this->isUsernameUsed($data->getUsername())) {
             $event->getForm()
                     ->get('username')
                     ->addError(new FormError(sprintf('username "%s" already used', $data->getUsername())));
@@ -129,9 +129,21 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         $password = $encoder->hash($data->getPassword());
         
         $data->setPassword($password);
-        $event->setData($data);
     }
     
+    /**
+     * Inactive users count too: reactivating one must not create two active
+     * users sharing a username.
+     */
+    protected function isUsernameUsed(string $username): bool
+    {
+        if ($this->repo instanceof ObjectRepository) {
+            return null !== $this->repo->findOneBy(['username' => $username]);
+        }
+
+        return null !== $this->repo->findOneByUsernameAndActive($username);
+    }
+
     public function getRoles():array
     {
         $roles = [];

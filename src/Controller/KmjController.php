@@ -44,13 +44,15 @@ class KmjController extends AbstractKmjController
      * @param  KmjUserRepoInterface $repo
      * @param  string               $identityNumber
      * @return Response
-     * @throws UserNotFoundException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function resetPassword(Request $request, KmjUserRepoInterface $repo, string $identityNumber): Response
     {
+        $this->denyAccessUnlessGranted($this->getParameter('user')['reset_password_role']);
+
         $user = $repo->findOneByIdentityNumber($identityNumber);
         if (!$user) {
-            throw new UserNotFoundException($identityNumber);
+            throw $this->createNotFoundException((new UserNotFoundException($identityNumber))->getMessage());
         }
         
         $userReset = new ResettingPassword($user);

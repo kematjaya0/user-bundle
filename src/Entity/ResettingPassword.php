@@ -75,11 +75,13 @@ class ResettingPassword implements ResettingPasswordInterface
         return $this;
     }
 
+    /**
+     * Holds the typed plain password only. ResetPasswordType sets the hashed
+     * password on the user once the form is valid.
+     */
     public function setPassword(string $password):self 
     {
         $this->password = $password;
-        
-        $this->user->setPassword($password);
         
         return $this;
     }

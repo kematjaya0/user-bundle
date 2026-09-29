@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 
 /**
@@ -31,6 +32,13 @@ class AbstractKmjController extends AbstractController
         $this->routingConfigurationFactory = $routingConfigurationFactory;
     }
     
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            'doctrine' => '?' . ManagerRegistry::class,
+        ]);
+    }
+
     /**
      * Get array configurations
      * 
@@ -63,7 +71,7 @@ class AbstractKmjController extends AbstractController
             return null;
         }
         
-        $manager = $this->getDoctrine()->getManager();
+        $manager = $this->container->get('doctrine')->getManager();
 
         try{
             
@@ -74,7 +82,7 @@ class AbstractKmjController extends AbstractController
             
             return $user;
         } catch (Exception $ex) {
-            $this->addFlash("error", $ex->getMessages());
+            $this->addFlash("error", $ex->getMessage());
         }
         
         return null;

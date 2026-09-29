@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class UserCompilerPass implements CompilerPassInterface
 {
     //put your code here
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container) 
     {
         if (!$container->hasDefinition('event_dispatcher') && !$container->hasAlias('event_dispatcher')) {

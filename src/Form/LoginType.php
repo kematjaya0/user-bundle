@@ -33,6 +33,9 @@ class LoginType extends AbstractType
         $this->configs = $bag->get('user');
     }
     
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -54,7 +57,7 @@ class LoginType extends AbstractType
      * 
      * @return string
      */
-    public function getBlockPrefix() 
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }

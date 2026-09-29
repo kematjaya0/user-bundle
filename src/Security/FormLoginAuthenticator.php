@@ -9,6 +9,7 @@ namespace Kematjaya\UserBundle\Security;
 use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Kematjaya\UserBundle\Form\LoginType;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -16,16 +17,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * @package Kematjaya\UserBundle\Security
@@ -35,22 +33,23 @@ use Symfony\Component\Security\Core\Security;
 class FormLoginAuthenticator extends AbstractAuthenticator 
 {
     /**
-     * 
-     * @var ContainerInterface
+     * Same values as Security::AUTHENTICATION_ERROR / LAST_USERNAME (Symfony 5.4)
+     * and SecurityRequestAttributes (Symfony 6.2+), without depending on either class.
      */
-    private $container;
+    public const AUTHENTICATION_ERROR = '_security.last_error';
+    public const LAST_USERNAME = '_security.last_username';
+
+    /**
+     * 
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
     
     /**
      * 
      * @var KmjUserRepoInterface
      */
     private $kmjUserRepository;
-    
-    /**
-     * 
-     * @var PasswordHasherFactoryInterface
-     */
-    private $passwordHasherFactory;
     
     /**
      * 
@@ -64,16 +63,20 @@ class FormLoginAuthenticator extends AbstractAuthenticator
      */
     private $urlGenerator;
     
-    public function __construct(ContainerInterface $container, UrlGeneratorInterface $urlGenerator, RoutingConfigurationFactoryInterface $routingConfigurationFactory, PasswordHasherFactoryInterface $passwordHasherFactory, KmjUserRepoInterface $kmjUserRepository) 
+    public function __construct(FormFactoryInterface $formFactory, UrlGeneratorInterface $urlGenerator, RoutingConfigurationFactoryInterface $routingConfigurationFactory, KmjUserRepoInterface $kmjUserRepository) 
     {
-        $this->container = $container;
+        $this->formFactory = $formFactory;
         $this->kmjUserRepository = $kmjUserRepository;
-        $this->passwordHasherFactory = $passwordHasherFactory;
         $this->routingConfigurationFactory = $routingConfigurationFactory;
         $this->urlGenerator = $urlGenerator;
     }
     
-    public function authenticate(Request $request): PassportInterface 
+    /**
+     * Unknown or inactive users and wrong passwords all end as the same
+     * "Invalid credentials." error (security.hide_user_not_found), so the
+     * login page does not reveal which usernames exist.
+     */
+    public function authenticate(Request $request): Passport
     {
         $form = $this->createForm(LoginType::class);
         $form->handleRequest($request);
@@ -83,38 +86,29 @@ class FormLoginAuthenticator extends AbstractAuthenticator
             );
         }
         
+        $credentials = $form->getData();
+        if ($request->hasSession()) {
+            $request->getSession()->set(self::LAST_USERNAME, $credentials['username'] ?? '');
+        }
+
         if (!$form->isValid()) {
             throw new CustomUserMessageAuthenticationException(
                 $this->getErrors($form)
             );
         }
         
-        $credentials = $form->getData();
-        $user = $this->kmjUserRepository->findOneByUsernameAndActive($credentials['username']);
-        if (!$user) {
-            throw new CustomUserMessageAuthenticationException(
-                sprintf("user not found: '%s'", $credentials['username'])
-            );
-        }
-        
-        $hasher = $this->passwordHasherFactory->getPasswordHasher($user);
-        if (!$hasher->verify($user->getPassword(), $credentials['password'])) {
-            throw new CustomUserMessageAuthenticationException(
-                sprintf("wrong password")
-            );
-        }
-        
-        return new SelfValidatingPassport(
-            new UserBadge($user->getUsername(), function (string $identifier) {
+        return new Passport(
+            new UserBadge((string) $credentials['username'], function (string $identifier) {
                 return $this->kmjUserRepository->findOneByUsernameAndActive($identifier);
-            })
+            }),
+            new PasswordCredentials((string) $credentials['password'])
         );
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response 
     {
         if ($request->hasSession()) {
-            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
+            $request->getSession()->set(self::AUTHENTICATION_ERROR, $exception);
         }
 
         return null;
@@ -130,9 +124,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
             $targetPath
         );
         if ($request->cookies->has("redirect_path")) {
-            $response->headers->setCookie(
-                Cookie::create("redirect_path", null)
-            );
+            $response->headers->clearCookie("redirect_path");
         }
         
         return $response;
@@ -145,7 +137,7 @@ class FormLoginAuthenticator extends AbstractAuthenticator
     
     protected function createForm(string $className, $data = null): FormInterface
     {
-        return $this->container->get('form.factory')->create($className, $data);
+        return $this->formFactory->create($className, $data);
     }
     
     protected function getErrors(FormInterface $form):?string 

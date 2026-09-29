@@ -49,7 +49,8 @@ class UserRepository extends KmjUserRepository
     {
         $qb = parent::createQueryBuilder($alias, $indexBy);
         $user = $this->getUser();
-        if (KmjUserInterface::ROLE_SUPER_USER === $user->getSingleRole()) {
+        // no authenticated user (console command, fixtures): no role filter
+        if (null === $user || in_array(KmjUserInterface::ROLE_SUPER_USER, $user->getRoles(), true)) {
             
             return $qb;
         }
@@ -70,15 +71,12 @@ class UserRepository extends KmjUserRepository
         return $qb;
     }
     
-    protected function getUser():?DefaultUser
+    protected function getUser():?KmjUserInterface
     {
         $token = $this->getToken();
-        if (null === $token) {
-            
-            return null;
-        }
-        
-        return $token->getUser();
+        $user = null !== $token ? $token->getUser() : null;
+
+        return $user instanceof KmjUserInterface ? $user : null;
     }
     
     protected function getToken():?TokenInterface

@@ -13,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class UserBundle extends Bundle
 {
+    /**
+     * @return void
+     */
     public function build(ContainerBuilder $container)
     {
         parent::build($container);

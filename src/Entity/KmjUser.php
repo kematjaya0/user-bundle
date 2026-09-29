@@ -53,11 +53,16 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
         return $this->id;
     }
 
-    public function __toString() 
+    public function __toString()
     {
-        return $this->getName();
+        return (string) $this->getName();
     }
-    
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->username;
+    }
+
     public function getUsername(): ?string
     {
         return $this->username;
@@ -94,9 +99,9 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
         return $this;
     }
 
-    public function getRoles(): ?array
+    public function getRoles(): array
     {
-        return $this->roles;
+        return $this->roles ?? [];
     }
 
     public function setRoles(array $roles): KmjUserInterface
@@ -127,11 +132,16 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
         return $this->getUsername();
     }
 
-     /**
-      * @see UserInterface
-      */
+    /**
+     * Called by Symfony after every successful authentication to clear temporary
+     * sensitive data (e.g. a plain password). This entity keeps none, and it must
+     * not change the active flag here: a later flush would deactivate the user.
+     *
+     * @see UserInterface
+     *
+     * @return void
+     */
     public function eraseCredentials()
     {
-        $this->is_active = false;
     }
 }

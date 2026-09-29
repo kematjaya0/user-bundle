@@ -53,24 +53,32 @@ class UnauthorizedEventListener
     protected function createResponse(ExceptionEvent $event)
     {
         $configs = $this->parameterBag->get("user");
-        $event->getRequest()->getSession()->getFlashBag()->add("error", $event->getThrowable()->getMessage());
+        $request = $event->getRequest();
+        // stateless firewalls (e.g. an API) have no session
+        if ($request->hasSession()) {
+            $request->getSession()->getFlashBag()->add("error", $event->getThrowable()->getMessage());
+        }
+
         $redirectPath = $configs['route']['unauthorize_redirect_path'];
         $response = new RedirectResponse(
             $this->urlGenerator->generate($redirectPath)
         );
-        
-        $url = $this->urlGenerator->generate(
-            $event->getRequest()->attributes->get("_route"),
-            $event->getRequest()->attributes->get("_route_params"),
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-        
-        $response->headers->setCookie(
-            Cookie::create(
-                "redirect_path", 
-                $url
-            )
-        );
+
+        $route = $request->attributes->get("_route");
+        if (null !== $route) {
+            $url = $this->urlGenerator->generate(
+                $route,
+                $request->attributes->get("_route_params") ?? [],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+            $response->headers->setCookie(
+                Cookie::create(
+                    "redirect_path", 
+                    $url
+                )
+            );
+        }
+
         $event->setResponse($response);
     }
 }

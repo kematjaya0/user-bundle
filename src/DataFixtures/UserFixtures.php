@@ -32,7 +32,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
         $this->encoderFactory = $encoderFactory;
     }
     
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $arr = [
             KmjUserInterface::ROLE_SUPER_USER => ['root'], 

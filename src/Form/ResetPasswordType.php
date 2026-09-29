@@ -34,6 +34,9 @@ class ResetPasswordType extends AbstractType
         $this->encoderFactory = $encoderFactory;
     }
     
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -66,13 +69,15 @@ class ResetPasswordType extends AbstractType
             
                 $user = $data->getUser();
                 $encoder = $this->encoderFactory->getPasswordHasher($user);
-                $data->setPassword($encoder->hash($user->getPassword()));
+                $user->setPassword($encoder->hash($data->getPassword()));
             
-                $event->setData($data);
             }
         );
     }
     
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

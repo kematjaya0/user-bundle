@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class UserTypeCompilerPass implements CompilerPassInterface
 {
+    /**
+     * @return void
+     */
     public function process(ContainerBuilder $container)
     {
         $definition = $container->findDefinition(UserTypeSubscriberBuilderInterface::class);

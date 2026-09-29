@@ -25,6 +25,10 @@ class Configuration implements ConfigurationInterface
     {
         $node
             ->booleanNode('use_captcha')->defaultTrue()->end()
+            ->scalarNode('reset_password_role')
+                ->info('role required to reset the password of another user (route kmj_user_reset_password)')
+                ->defaultValue('ROLE_ADMINISTRATOR')
+            ->end()
             ->arrayNode('route')->addDefaultsIfNotSet()
                 ->children()
                     ->scalarNode('unauthorize_redirect_path')->defaultValue('kmj_user_login')->end()

@@ -26,6 +26,9 @@ class KmjUserType extends AbstractType
         $this->userTypeSubscriberBuilder = $userTypeSubscriberBuilder;
     }
     
+    /**
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -46,6 +49,9 @@ class KmjUserType extends AbstractType
         }
     }
 
+    /**
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

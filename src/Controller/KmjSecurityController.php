@@ -43,7 +43,7 @@ class KmjSecurityController extends AbstractKmjController
     public function login(): Response
     {
         if ($this->getUser()) {
-            $this->addFlash("info", 'wellcome back : '. $this->getUser()->getUsername());
+            $this->addFlash("info", 'wellcome back : '. $this->getUser()->getUserIdentifier());
             
             return $this->redirectToRoute($this->getRoutingConfiguration()->getLoginSuccessRedirectPath($this->getUser()->getRoles()));
         }

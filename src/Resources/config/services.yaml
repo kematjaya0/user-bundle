@@ -3,61 +3,56 @@ services:
         autowire: true
         autoconfigure: true
         public: false
-        
+
     Kematjaya\UserBundle\EventListener\UnauthorizedEventListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
-            
+
     Kematjaya\UserBundle\Repo\KmjUserRepository:
         class: Kematjaya\UserBundle\Repo\KmjUserRepository
-        tags: 
+        tags:
             - doctrine.repository_service
-            
+
     Kematjaya\UserBundle\Repo\UserRepository:
         class: Kematjaya\UserBundle\Repo\UserRepository
-        tags: 
+        tags:
             - doctrine.repository_service
-        
+
     Kematjaya\UserBundle\Repo\KmjUserRepoInterface:
         class: Kematjaya\UserBundle\Repo\UserRepository
-        tags: 
+        tags:
             - doctrine.repository_service
-            
-    Kematjaya\UserBundle\Security\KmjLoginAuthenticator:
-        class: Kematjaya\UserBundle\Security\KmjLoginAuthenticator
-        
+
+    # KmjLoginAuthenticator (Guard) and UserFixtures are registered by UserExtension
+    # only when their parent classes exist.
+
+    # AbstractController is a service subscriber: autowiring injects its service
+    # locator, so the full container must not be passed with setContainer().
     Kematjaya\UserBundle\Controller\KmjSecurityController:
-        class: Kematjaya\UserBundle\Controller\KmjSecurityController
-        calls: 
-            - setContainer: ['@service_container']
-            
+        public: true
+        tags: ['controller.service_arguments']
+
     Kematjaya\UserBundle\Controller\KmjController:
-        class: Kematjaya\UserBundle\Controller\KmjController
-        calls: 
-            - setContainer: ['@service_container']
-        
+        public: true
+        tags: ['controller.service_arguments']
+
     Kematjaya\UserBundle\Form\ChangePasswordType:
         class: Kematjaya\UserBundle\Form\ChangePasswordType
-        
+
     Kematjaya\UserBundle\Form\ResetPasswordType:
         class: Kematjaya\UserBundle\Form\ResetPasswordType
-        
+
     Kematjaya\UserBundle\Form\KmjUserType: ~
     Kematjaya\UserBundle\Form\LoginType: ~
-    
+
     Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface:
         class: Kematjaya\UserBundle\Subscriber\UserTypeSubscriber
-            
-    Kematjaya\UserBundle\DataFixtures\UserFixtures:
-        class: Kematjaya\UserBundle\DataFixtures\UserFixtures
-        tags: 
-            - doctrine.fixture.orm
-            
+
     Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface:
         class: Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilder
-        
+
     Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface:
         class: Kematjaya\UserBundle\Config\RoutingConfigurationFactory
-        
+
     Kematjaya\UserBundle\Security\FormLoginAuthenticator:
         class: Kematjaya\UserBundle\Security\FormLoginAuthenticator
