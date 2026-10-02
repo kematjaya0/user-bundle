@@ -6,38 +6,33 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Repo\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Kematjaya\UserBundle\Repo\UserRepository;
 
 /**
- * @ORM\Table(name="kmj_default_user")
- * @ORM\Entity(repositoryClass=UserRepository::class)
  * @package Kematjaya\UserBundle\Entity
  * @license https://opensource.org/licenses/MIT MIT
  * @author  Nur Hidayatullah <kematjaya0@gmail.com>
  */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: 'kmj_default_user')]
 class DefaultUser extends KmjUser
 {
-    
-    /**
-     * 
-     * @var string
-     */
-    private $single_role;
-    
-    public function getSingleRole(): string 
+    private ?string $single_role = null;
+
+    public function getSingleRole(): string
     {
         $roles = $this->getRoles();
-        
+
         return end($roles);
     }
 
-    public function setSingleRole(string $single_role):self
+    public function setSingleRole(string $single_role): self
     {
         $this->single_role = $single_role;
-        
+
         $this->setRoles([$single_role]);
-        
+
         return $this;
     }
 

@@ -6,7 +6,8 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 /**
  * @package Kematjaya\UserBundle\Entity
@@ -15,63 +16,43 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  */
 class ResettingPassword implements ResettingPasswordInterface
 {
-    /**
-     * 
-     * @var KmjUserInterface
-     */
-    private $user;
-    
-    /**
-     * 
-     * @var string
-     */
-    private $password;
-    
-    /**
-     * 
-     * @var string
-     */
-    private $retype_password;
-    
-    public function __construct(KmjUserInterface $user) 
+    private ?string $password = null;
+
+    private ?string $retype_password = null;
+
+    public function __construct(private KmjUserInterface $user) {}
+
+    public function getId(): UuidInterface
     {
-        $this->user = $user;
+        return Uuid::fromDateTime(new \DateTime());
     }
-    
-    public function getId():\Ramsey\Uuid\UuidInterface
-    {
-        return \Ramsey\Uuid\Uuid::fromDateTime(new \DateTime());
-    }
-    
-    public function getUser(): KmjUserInterface 
+
+    public function getUser(): KmjUserInterface
     {
         return $this->user;
     }
 
-    public function getUsername():?string
+    public function getUsername(): ?string
     {
         return $this->user->getUsername();
     }
-    
-    public function setUsername(string $usermane)
-    {
-        
-    }
-    
-    public function getPassword(): ?string 
+
+    public function setUsername(string $usermane): void {}
+
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function getRetypePassword(): ?string 
+    public function getRetypePassword(): ?string
     {
         return $this->retype_password;
     }
 
-    public function setUser(KmjUserInterface $user):ResettingPasswordInterface 
+    public function setUser(KmjUserInterface $user): ResettingPasswordInterface
     {
         $this->user = $user;
-        
+
         return $this;
     }
 
@@ -79,17 +60,17 @@ class ResettingPassword implements ResettingPasswordInterface
      * Holds the typed plain password only. ResetPasswordType sets the hashed
      * password on the user once the form is valid.
      */
-    public function setPassword(string $password):self 
+    public function setPassword(string $password): self
     {
         $this->password = $password;
-        
+
         return $this;
     }
 
     public function setRetypePassword(string $retypePassword): self
     {
         $this->retype_password = $retypePassword;
-        
+
         return $this;
     }
 

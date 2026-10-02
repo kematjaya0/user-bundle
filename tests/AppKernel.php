@@ -109,7 +109,7 @@ class AppKernel extends Kernel
                 'mappings' => [
                     'UserBundle' => [
                         'is_bundle' => true,
-                        'type' => 'annotation',
+                        'type' => 'attribute',
                         'dir' => 'Entity',
                         'prefix' => 'Kematjaya\UserBundle\Entity',
                     ],

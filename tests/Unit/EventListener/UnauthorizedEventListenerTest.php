@@ -19,9 +19,7 @@ class UnauthorizedEventListenerTest extends TestCase
     private function createListener(): UnauthorizedEventListener
     {
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturnCallback(function (string $name, array $params = [], int $type = UrlGeneratorInterface::ABSOLUTE_PATH) {
-            return (UrlGeneratorInterface::ABSOLUTE_URL === $type ? 'http://localhost' : '') . '/' . $name;
-        });
+        $urlGenerator->method('generate')->willReturnCallback(fn(string $name, array $params = [], int $type = UrlGeneratorInterface::ABSOLUTE_PATH): string => (UrlGeneratorInterface::ABSOLUTE_URL === $type ? 'http://localhost' : '') . '/' . $name);
 
         return new UnauthorizedEventListener(
             $urlGenerator,

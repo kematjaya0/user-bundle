@@ -2,26 +2,26 @@
 
 namespace Kematjaya\UserBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder(): TreeBuilder 
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('user');
         $rootNode = $treeBuilder->getRootNode();
-        
+
         $this->addRouteConfig($rootNode->children());
-        
+
         return $treeBuilder;
     }
-    
-    public function addRouteConfig(NodeBuilder $node)
+
+    public function addRouteConfig(NodeBuilder $node): void
     {
         $node
             ->booleanNode('use_captcha')->defaultTrue()->end()

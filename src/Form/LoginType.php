@@ -6,12 +6,12 @@
 
 namespace Kematjaya\UserBundle\Form;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Gregwar\CaptchaBundle\Type\CaptchaType;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * @package Kematjaya\UserBundle\Form
@@ -20,43 +20,32 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class LoginType extends AbstractType
 {
-    const NAME = 'kmj_login';
-    
-    /**
-     * 
-     * @var array
-     */
-    private $configs;
-    
-    public function __construct(ParameterBagInterface $bag) 
+    public const NAME = 'kmj_login';
+
+    private readonly array $configs;
+
+    public function __construct(ParameterBagInterface $bag)
     {
         $this->configs = $bag->get('user');
     }
-    
-    /**
-     * @return void
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
                 ->add('username', TextType::class, [
-                    'label' => 'username'
+                    'label' => 'username',
                 ])
                 ->add('password', PasswordType::class, [
-                    'label' => 'password'
+                    'label' => 'password',
                 ]);
-                
+
         if ($this->configs['use_captcha']) {
             $builder->add('captcha', CaptchaType::class, [
-                'label' => 'captcha'
+                'label' => 'captcha',
             ]);
         }
     }
-    
-    /**
-     * 
-     * @return string
-     */
+
     public function getBlockPrefix(): string
     {
         return self::NAME;

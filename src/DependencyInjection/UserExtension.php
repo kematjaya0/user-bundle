@@ -2,30 +2,27 @@
 
 namespace Kematjaya\UserBundle\DependencyInjection;
 
-use Kematjaya\UserBundle\DataFixtures\UserFixtures;
-use Kematjaya\UserBundle\DependencyInjection\Configuration;
-use Kematjaya\UserBundle\Security\KmjLoginAuthenticator;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+use Kematjaya\UserBundle\DataFixtures\UserFixtures;
+use Kematjaya\UserBundle\Security\KmjLoginAuthenticator;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
+
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 class UserExtension extends Extension
 {
-    /**
-     * @return void
-     */
-    public function load(array $configs, ContainerBuilder $container) 
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        
-        $loader = new YamlFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
+
+        $loader = new YamlFileLoader($container, new FileLocator(dirname(__DIR__) . '/Resources/config'));
         $loader->load('services.yaml');
-        
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
         $container->setParameter($this->getAlias(), $config);

@@ -6,13 +6,13 @@
 
 namespace Kematjaya\UserBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 
 /**
  * @package Kematjaya\UserBundle\Controller
@@ -21,17 +21,8 @@ use Exception;
  */
 class AbstractKmjController extends AbstractController
 {
-    /**
-     * 
-     * @var RoutingConfigurationFactoryInterface
-     */
-    private $routingConfigurationFactory;
-    
-    public function __construct(RoutingConfigurationFactoryInterface $routingConfigurationFactory)
-    {
-        $this->routingConfigurationFactory = $routingConfigurationFactory;
-    }
-    
+    public function __construct(private readonly RoutingConfigurationFactoryInterface $routingConfigurationFactory) {}
+
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
@@ -41,97 +32,84 @@ class AbstractKmjController extends AbstractController
 
     /**
      * Get array configurations
-     * 
-     * @return RoutingConfigurationFactoryInterface
      */
-    protected function getRoutingConfiguration()
+    protected function getRoutingConfiguration(): RoutingConfigurationFactoryInterface
     {
         return $this->routingConfigurationFactory;
     }
-    
+
     /**
      * Process form from request
-     * 
-     * @param  Request       $request
-     * @param  FormInterface $form
-     * @return type
      */
-    protected function processForm(Request $request, FormInterface $form)
+    protected function processForm(Request $request, FormInterface $form): ?object
     {
         $form->handleRequest($request);
         if (!$form->isSubmitted()) {
-            
+
             return null;
         }
-        
+
         if (!$form->isValid()) {
             $errors = $this->getErrorsFromForm($form);
             $this->addFlash("error", implode(", ", $errors));
-            
+
             return null;
         }
-        
+
         $manager = $this->container->get('doctrine')->getManager();
 
-        try{
-            
+        try {
+
             $user = $this->saveObject($form->getData(), $manager);
-            if($user) {
+            if ($user) {
                 $this->addFlash("info", "change password successfully.");
             }
-            
+
             return $user;
         } catch (Exception $ex) {
             $this->addFlash("error", $ex->getMessage());
         }
-        
+
         return null;
     }
-    
+
     /**
      * Saving object into database
-     * 
-     * @param  mixed                  $object
-     * @param  EntityManagerInterface $manager
-     * @return type
      */
-    protected function saveObject($object, EntityManagerInterface $manager) 
+    protected function saveObject(object $object, EntityManagerInterface $manager): object
     {
         $manager->transactional(
-            function (EntityManagerInterface $em) use ($object) {
+            function (EntityManagerInterface $em) use ($object): void {
                 $em->persist($object);
             }
         );
-        
+
         return $object;
     }
-    
+
     /**
      * Get error form
-     * 
-     * @param  FormInterface $form
-     * @return type
      */
-    protected function getErrorsFromForm(FormInterface $form)
+    protected function getErrorsFromForm(FormInterface $form): array
     {
-        $errors = array();
+        $errors = [];
         foreach ($form->getErrors() as $error) {
             $errors[] = $error->getMessage();
         }
-        
+
         foreach ($form->all() as $childForm) {
             if (!$childForm instanceof FormInterface) {
                 continue;
             }
-            
+
             $childErrors = $this->getErrorsFromForm($childForm);
             if (!$childErrors) {
                 continue;
             }
-            
+
             $errors[$childForm->getName()] = implode(", ", $childErrors);
         }
-        
+
         return $errors;
     }
 }

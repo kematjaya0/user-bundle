@@ -6,9 +6,9 @@
 
 namespace Kematjaya\UserBundle\Subscriber\Builder;
 
-use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
 
 /**
  * @package App\Subscriber\Builder
@@ -17,36 +17,29 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class UserTypeSubscriberBuilder implements UserTypeSubscriberBuilderInterface
 {
-    
-    /**
-     * 
-     * @var Collection
-     */
-    private $subscribers;
-    
-    public function __construct() 
+    private readonly ArrayCollection $subscribers;
+
+    public function __construct()
     {
         $this->subscribers = new ArrayCollection();
     }
-    
+
     public function addSubscriber(UserTypeSubscriberInterface $subscriber): UserTypeSubscriberBuilderInterface
     {
         $this->subscribers->add($subscriber);
-        
+
         return $this;
     }
-    
-    public function getSubscribers():Collection
+
+    public function getSubscribers(): Collection
     {
         return $this->subscribers;
     }
-    
+
     public function getSubscriber(string $className): ?UserTypeSubscriberInterface
     {
-        $subscribers = $this->subscribers->filter(function(UserTypeSubscriberInterface $subscriber) use ($className) {
-            return $subscriber->isSupported($className);
-        });
-        
+        $subscribers = $this->subscribers->filter(fn(UserTypeSubscriberInterface $subscriber): bool => $subscriber->isSupported($className));
+
         $subscriber = $subscribers->first();
 
         return $subscriber instanceof UserTypeSubscriberInterface ? $subscriber : null;

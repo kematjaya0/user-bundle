@@ -6,8 +6,6 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
-
 /**
  * @package Kematjaya\UserBundle\Entity
  * @license https://opensource.org/licenses/MIT MIT
@@ -15,7 +13,7 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  */
 interface ResettingPasswordInterface
 {
-    public function getUser():?KmjUserInterface;
-    
-    public function setUser(KmjUserInterface $user):self;
+    public function getUser(): ?KmjUserInterface;
+
+    public function setUser(KmjUserInterface $user): self;
 }

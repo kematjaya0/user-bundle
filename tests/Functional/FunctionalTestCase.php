@@ -14,10 +14,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 abstract class FunctionalTestCase extends WebTestCase
 {
-    /**
-     * @var KernelBrowser
-     */
-    protected $client;
+    protected KernelBrowser $client;
 
     protected function setUp(): void
     {

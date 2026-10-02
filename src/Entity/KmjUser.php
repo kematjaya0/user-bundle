@@ -2,58 +2,45 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Repo\KmjUserRepository;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Uid\Uuid;
 
-/**
- * @ORM\Table(name="kmj_user")
- * @ORM\Entity(repositoryClass=KmjUserRepository::class)
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- */
-abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface
+#[ORM\Entity(repositoryClass: KmjUserRepository::class)]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\Table(name: 'kmj_user')]
+abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface, \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="uuid", unique=true)
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\CustomIdGenerator(class=Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator::class)
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    private ?Uuid $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $username;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $username = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $password;
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $password = null;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $is_active;
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $is_active = null;
 
-    public function getId(): ?\Symfony\Component\Uid\Uuid
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return (string) $this->getName();
     }
@@ -122,9 +109,8 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
 
         return $this;
     }
-    
+
     /**
-     * @return string|null
      * @see UserInterface
      */
     public function getSalt(): ?string
@@ -138,10 +124,6 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
      * not change the active flag here: a later flush would deactivate the user.
      *
      * @see UserInterface
-     *
-     * @return void
      */
-    public function eraseCredentials()
-    {
-    }
+    public function eraseCredentials(): void {}
 }
