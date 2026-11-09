@@ -3,3 +3,8 @@
 /var
 composer.lock
 .idea
+/yes
+/yes.pub
+.phpunit.result.cache
+.phpunit.cache
+.php-cs-fixer.cache
