@@ -3,26 +3,27 @@
 namespace Kematjaya\UserBundle\Security;
 
 use Kematjaya\UserBundle\Form\LoginType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
@@ -34,7 +35,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
     private array $options;
-    public function __construct(private HttpUtils $httpUtils, private UrlGeneratorInterface $urlGenerator, private UserProviderInterface $userProvider, private FormFactoryInterface $formFactory)
+    public function __construct(private readonly HttpUtils $httpUtils, private readonly UrlGeneratorInterface $urlGenerator, private readonly UserProviderInterface $userProvider, private readonly FormFactoryInterface $formFactory)
     {
         $this->options = array_merge([
             'username_parameter' => '_username',
@@ -75,9 +76,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             throw new BadCredentialsException("user tidak ditemukan");
         }
 
-        $userBadge = new UserBadge($credentials['username'], function () use ($credentials) {
-            return $this->userProvider->loadUserByIdentifier($credentials["username"]);
-        });
+        $userBadge = new UserBadge($credentials['username'], fn (): UserInterface => $this->userProvider->loadUserByIdentifier($credentials["username"]));
         $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
 
         if ($this->userProvider instanceof PasswordUpgraderInterface) {
@@ -92,12 +91,12 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         $params = $request->query->all();
         if (isset($params["grant_type"]) && isset($params["client_id"])) {
             return new RedirectResponse(
-                $this->urlGenerator->generate("sso_authorize", $params)
+                $this->urlGenerator->generate("sso_authorize", $params),
             );
         }
 
         return new RedirectResponse(
-            $this->httpUtils->generateUri($request, "dashboard_index")
+            $this->httpUtils->generateUri($request, "dashboard_index"),
         );
     }
 
@@ -105,7 +104,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
         return new RedirectResponse(
-            $this->getLoginUrl($request)
+            $this->getLoginUrl($request),
         );
     }
 
@@ -116,13 +115,13 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         $form->handleRequest($request);
         if (!$form->isSubmitted()) {
             throw new CustomUserMessageAuthenticationException(
-                "please submit form"
+                "please submit form",
             );
         }
 
         if (!$form->isValid()) {
             throw new CustomUserMessageAuthenticationException(
-                $this->getErrors($form)
+                $this->getErrors($form),
             );
         }
 
@@ -150,7 +149,7 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return $credentials;
     }
 
-    protected function getErrors(FormInterface $form):?string
+    protected function getErrors(FormInterface $form): ?string
     {
         $errors = [];
         foreach ($form->getErrors(true) as $error) {

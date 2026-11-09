@@ -2,10 +2,10 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterface;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @ORM\Table(name="kmj_user")
@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\LegacyPasswordAuthenticatedUserInterfac
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface
+abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedUserInterface, \Stringable
 {
     /**
      * @ORM\Id
@@ -48,16 +48,16 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
      */
     private $is_active;
 
-    public function getId(): ?\Symfony\Component\Uid\Uuid
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
 
-    public function __toString() 
+    public function __toString(): string
     {
-        return $this->getName();
+        return (string) $this->getName();
     }
-    
+
     public function getUsername(): ?string
     {
         return $this->username;
@@ -94,7 +94,7 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
         return $this;
     }
 
-    public function getRoles(): ?array
+    public function getRoles(): array
     {
         return $this->roles;
     }
@@ -117,9 +117,8 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
 
         return $this;
     }
-    
+
     /**
-     * @return string|null
      * @see UserInterface
      */
     public function getSalt(): ?string
@@ -127,10 +126,10 @@ abstract class KmjUser implements KmjUserInterface, LegacyPasswordAuthenticatedU
         return $this->getUsername();
     }
 
-     /**
-      * @see UserInterface
-      */
-    public function eraseCredentials()
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
     {
         $this->is_active = false;
     }

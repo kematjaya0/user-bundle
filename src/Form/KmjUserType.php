@@ -9,48 +9,39 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * 
+ *
  * @author Nur Hidayatullah <kematjaya0@hmail.com>
  */
 class KmjUserType extends AbstractType
 {
-    
-    /**
-     * 
-     * @var UserTypeSubscriberBuilderInterface
-     */
-    private $userTypeSubscriberBuilder;
-    
-    public function __construct(UserTypeSubscriberBuilderInterface $userTypeSubscriberBuilder) 
+    public function __construct(private readonly UserTypeSubscriberBuilderInterface $userTypeSubscriberBuilder)
     {
-        $this->userTypeSubscriberBuilder = $userTypeSubscriberBuilder;
     }
-    
-    public function buildForm(FormBuilderInterface $builder, array $options)
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('username', null, [
-                'label' => 'username'
+                'label' => 'username',
             ])
             ->add('name', null, [
-                'label' => 'name'
+                'label' => 'name',
             ])
             ->add('is_active', null, [
-                'label' => 'is_active'
+                'label' => 'is_active',
             ]);
-        
-        $className = get_class($builder->getData());
+
+        $className = $builder->getData()::class;
         $subscriber = $this->userTypeSubscriberBuilder->getSubscriber($className);
         if ($subscriber) {
             $builder->addEventSubscriber($subscriber);
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => KmjUserInterface::class,
         ]);
     }
 }
-

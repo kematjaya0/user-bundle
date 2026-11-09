@@ -1,10 +1,23 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<phpunit bootstrap="./vendor/autoload.php">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         stopOnFailure="false"
+         cacheDirectory=".phpunit.cache">
+    <php>
+        <ini name="error_reporting" value="-1"/>
+    </php>
     <testsuites>
-        <testsuite name="My Project - TestSuite">
-            <directory>./tests</directory>
+        <testsuite name="UserBundle Test Suite">
+            <directory>tests/</directory>
         </testsuite>
     </testsuites>
-
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
 </phpunit>

@@ -3,10 +3,11 @@
 /**
  * This file is part of the user-bundle.
  */
+
 namespace Kematjaya\UserBundle\Tests\Repository;
 
-use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 
 /**
  * @license https://opensource.org/licenses/MIT MIT
@@ -14,20 +15,19 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  */
 class KmjUserRepository implements KmjUserRepoInterface
 {
-    
-    public function createUser(): KmjUserInterface 
+    public function createUser(): KmjUserInterface
     {
-        
+
     }
 
-    public function findOneByIdentityNumber(string $identityNumber): ?KmjUserInterface 
+    public function findOneByIdentityNumber(string $identityNumber): ?KmjUserInterface
     {
-        
+
     }
 
-    public function findOneByUsernameAndActive(string $username): ?KmjUserInterface 
+    public function findOneByUsernameAndActive(string $username): ?KmjUserInterface
     {
-        
+
     }
 
 }

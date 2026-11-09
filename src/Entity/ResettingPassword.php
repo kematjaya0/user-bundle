@@ -6,7 +6,7 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Kematjaya\UserBundle\Entity\KmjUserInterface;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @package Kematjaya\UserBundle\Entity
@@ -15,79 +15,68 @@ use Kematjaya\UserBundle\Entity\KmjUserInterface;
  */
 class ResettingPassword implements ResettingPasswordInterface
 {
-    /**
-     * 
-     * @var KmjUserInterface
-     */
-    private $user;
-    
-    /**
-     * 
-     * @var string
-     */
-    private $password;
-    
-    /**
-     * 
-     * @var string
-     */
-    private $retype_password;
-    
-    public function __construct(KmjUserInterface $user) 
+    private ?string $password = null;
+
+    private ?string $retype_password = null;
+
+    public function __construct(private KmjUserInterface $user)
     {
-        $this->user = $user;
     }
-    
-    public function getId():\Ramsey\Uuid\UuidInterface
+
+    public function getId(): mixed
     {
-        return \Ramsey\Uuid\Uuid::fromDateTime(new \DateTime());
+        if (class_exists(Uuid::class)) {
+            return Uuid::fromDateTime(new \DateTime());
+        }
+
+        return \Symfony\Component\Uid\Uuid::v7();
     }
-    
-    public function getUser(): KmjUserInterface 
+
+    public function getUser(): KmjUserInterface
     {
         return $this->user;
     }
 
-    public function getUsername():?string
+    public function getUsername(): ?string
     {
         return $this->user->getUsername();
     }
-    
+
     public function setUsername(string $usermane)
     {
-        
+
     }
-    
-    public function getPassword(): ?string 
+
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function getRetypePassword(): ?string 
+    public function getRetypePassword(): ?string
     {
         return $this->retype_password;
     }
 
-    public function setUser(KmjUserInterface $user):ResettingPasswordInterface 
+    public function setUser(KmjUserInterface $user): ResettingPasswordInterface
     {
         $this->user = $user;
-        
+
         return $this;
     }
 
-    public function setPassword(string $password):self 
+    public function setPassword(string $password): self
     {
         $this->password = $password;
-        
+
         $this->user->setPassword($password);
-        
+
         return $this;
     }
 
     public function setRetypePassword(string $retypePassword): self
     {
         $this->retype_password = $retypePassword;
-        
+
         return $this;
     }
 

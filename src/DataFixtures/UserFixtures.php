@@ -2,35 +2,29 @@
 
 namespace Kematjaya\UserBundle\DataFixtures;
 
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Persistence\ObjectManager;
 use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+
 /**
  * @author Nur Hidayatullah <kematjaya0@gmail.com>
  */
 class UserFixtures extends Fixture implements FixtureGroupInterface
 {
-    
-    private KmjUserRepoInterface $kmjUserRepo;
-
-    private PasswordHasherFactoryInterface $encoderFactory;
-    
-    public function __construct(KmjUserRepoInterface $kmjUserRepo, PasswordHasherFactoryInterface $encoderFactory) 
+    public function __construct(private readonly KmjUserRepoInterface $kmjUserRepo, private readonly PasswordHasherFactoryInterface $encoderFactory)
     {
-        $this->kmjUserRepo = $kmjUserRepo;
-        $this->encoderFactory = $encoderFactory;
     }
-    
-    public function load(ObjectManager $manager):void
+
+    public function load(ObjectManager $manager): void
     {
         $arr = [
-            KmjUserInterface::ROLE_SUPER_USER => ['root'], 
-            KmjUserInterface::ROLE_ADMINISTRATOR => ['admin']
+            KmjUserInterface::ROLE_SUPER_USER => ['root'],
+            KmjUserInterface::ROLE_ADMINISTRATOR => ['admin'],
         ];
-        
+
         $i = 1;
         foreach ($arr as $role => $users) {
             foreach ($users as $username) {
@@ -50,7 +44,7 @@ class UserFixtures extends Fixture implements FixtureGroupInterface
         $manager->flush();
     }
 
-    public static function getGroups(): array 
+    public static function getGroups(): array
     {
         return ['kmj-user'];
     }

@@ -6,10 +6,10 @@
 
 namespace Kematjaya\UserBundle\Subscriber\CompilerPass;
 
-use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
 use Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Kematjaya\UserBundle\Subscriber\UserTypeSubscriberInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -19,11 +19,14 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class UserTypeCompilerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
+        if (!$container->has(UserTypeSubscriberBuilderInterface::class)) {
+            return;
+        }
         $definition = $container->findDefinition(UserTypeSubscriberBuilderInterface::class);
         $taggedServices = $container->findTaggedServiceIds(UserTypeSubscriberInterface::TAG_NAME);
-        foreach($taggedServices as $id => $tags) {
+        foreach ($taggedServices as $id => $tags) {
             $definition->addMethodCall('addSubscriber', [new Reference($id)]);
         }
     }

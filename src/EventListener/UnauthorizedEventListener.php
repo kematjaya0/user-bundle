@@ -7,55 +7,55 @@
 
 namespace Kematjaya\UserBundle\EventListener;
 
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\InsufficientAuthenticationException;
 
 /**
  * Description of UnauthorizedEventListener
  *
  * @author guest
  */
-class UnauthorizedEventListener 
+class UnauthorizedEventListener
 {
-    
-    public function __construct(private UrlGeneratorInterface $urlGenerator, private ParameterBagInterface $parameterBag)
-    {}
-    
-    public function onKernelException(ExceptionEvent $event)
+    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly ParameterBagInterface $parameterBag)
+    {
+    }
+
+    public function onKernelException(ExceptionEvent $event): void
     {
         if ($event->getThrowable() instanceof InsufficientAuthenticationException) {
             $this->createResponse($event);
         }
-        
+
         if ($event->getThrowable()->getPrevious() instanceof InsufficientAuthenticationException) {
             $this->createResponse($event);
         }
     }
-    
+
     protected function createResponse(ExceptionEvent $event)
     {
         $configs = $this->parameterBag->get("user");
         $event->getRequest()->getSession()->getFlashBag()->add("error", $event->getThrowable()->getMessage());
         $redirectPath = $configs['route']['unauthorize_redirect_path'];
         $response = new RedirectResponse(
-            $this->urlGenerator->generate($redirectPath)
+            $this->urlGenerator->generate($redirectPath),
         );
-        
+
         $url = $this->urlGenerator->generate(
             $event->getRequest()->attributes->get("_route"),
             $event->getRequest()->attributes->get("_route_params"),
-            UrlGeneratorInterface::ABSOLUTE_URL
+            UrlGeneratorInterface::ABSOLUTE_URL,
         );
-        
+
         $response->headers->setCookie(
             Cookie::create(
-                "redirect_path", 
-                $url
-            )
+                "redirect_path",
+                $url,
+            ),
         );
         $event->setResponse($response);
     }

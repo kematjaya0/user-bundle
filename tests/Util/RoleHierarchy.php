@@ -15,12 +15,13 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy as Hierarchy;
  */
 class RoleHierarchy extends Hierarchy
 {
-    public function __construct() {
-        
+    public function __construct()
+    {
+
         $hierarchy = [
-            'ROLE_USER'
+            'ROLE_USER',
         ];
-        
+
         parent::__construct($hierarchy);
     }
 }
