@@ -11,7 +11,8 @@ use Kematjaya\UserBundle\Subscriber\UserTypeSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -53,7 +54,7 @@ class UserTypeSubscriberTest extends TestCase
         $form->expects($this->atLeastOnce())->method('add')->willReturnSelf();
         $form->expects($this->once())->method('remove')->with('roles')->willReturnSelf();
 
-        $event = new FormEvent($form, $user);
+        $event = new PostSetDataEvent($form, $user);
         $subscriber->postSetData($event);
     }
 
@@ -79,7 +80,7 @@ class UserTypeSubscriberTest extends TestCase
         $user->setPassword('plain_password');
 
         $form = $this->createMock(FormInterface::class);
-        $event = new FormEvent($form, $user);
+        $event = new PostSubmitEvent($form, $user);
 
         $subscriber->postSubmit($event);
 
@@ -108,7 +109,7 @@ class UserTypeSubscriberTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $form->method('get')->with('username')->willReturn($field);
 
-        $event = new FormEvent($form, $user);
+        $event = new PostSubmitEvent($form, $user);
         $subscriber->postSubmit($event);
     }
 
@@ -145,7 +146,7 @@ class UserTypeSubscriberTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())->method('remove')->with('roles')->willReturnSelf();
         $form->expects($this->exactly(5))->method('add')->willReturnSelf();
-        $subscriber->postSetData(new FormEvent($form, new DefaultUser()));
+        $subscriber->postSetData(new PostSetDataEvent($form, new DefaultUser()));
     }
 
     public function testPostSubmitIgnoresExistingUser(): void
@@ -157,7 +158,7 @@ class UserTypeSubscriberTest extends TestCase
         $repo->expects($this->never())->method('findOneByUsernameAndActive');
         $subscriber = new UserTypeSubscriber($repo, $this->createMock(TokenStorageInterface::class), $this->createMock(PasswordHasherFactoryInterface::class), $this->createMock(RoleHierarchyInterface::class));
 
-        $subscriber->postSubmit(new FormEvent($this->createMock(FormInterface::class), $user));
+        $subscriber->postSubmit(new PostSubmitEvent($this->createMock(FormInterface::class), $user));
         self::assertSame($user, $user);
     }
 
@@ -180,7 +181,7 @@ class UserTypeSubscriberTest extends TestCase
     public function testPostSubmitIgnoresUnsupportedData(): void
     {
         $subscriber = new UserTypeSubscriber($this->createMock(KmjUserRepoInterface::class), $this->createMock(TokenStorageInterface::class), $this->createMock(PasswordHasherFactoryInterface::class), $this->createMock(RoleHierarchyInterface::class));
-        $event = new FormEvent($this->createMock(FormInterface::class), new \stdClass());
+        $event = new PostSubmitEvent($this->createMock(FormInterface::class), new \stdClass());
 
         $subscriber->postSubmit($event);
         self::assertInstanceOf(\stdClass::class, $event->getData());

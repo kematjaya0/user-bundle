@@ -100,7 +100,6 @@ class UserTypeSubscriber implements UserTypeSubscriberInterface
         $password = $encoder->hash($data->getPassword());
 
         $data->setPassword($password);
-        $event->setData($data);
     }
 
     public function getRoles(): array

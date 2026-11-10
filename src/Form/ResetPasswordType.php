@@ -52,18 +52,26 @@ class ResetPasswordType extends AbstractType
                 }
 
                 $form = $event->getForm();
-                if (trim($data->getPassword()) != trim($data->getRetypePassword())) {
+                $password = trim((string) $data->getPassword());
+                if ('' === $password) {
+                    $form->get('password')->addError(
+                        new FormError("password cannot be empty."),
+                    );
+
+                    return;
+                }
+
+                if ($password !== trim((string) $data->getRetypePassword())) {
                     $form->get('retype_password')->addError(
                         new FormError("password not match."),
                     );
+
                     return;
                 }
 
                 $user = $data->getUser();
                 $encoder = $this->encoderFactory->getPasswordHasher($user);
-                $data->setPassword($encoder->hash($user->getPassword()));
-
-                $event->setData($data);
+                $user->setPassword($encoder->hash($password));
             },
         );
     }
