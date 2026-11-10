@@ -16,6 +16,8 @@ use Kematjaya\UserBundle\Repo\KmjUserRepoInterface;
 use Kematjaya\UserBundle\Repo\KmjUserRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -29,6 +31,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV4;
@@ -42,8 +46,14 @@ class KmjControllerTest extends TestCase
         ?Environment $twig = null,
         ?FormFactoryInterface $formFactory = null,
         ?SessionInterface $session = null,
+        bool $granted = true,
     ): Container {
-        $container = new Container();
+        $container = new Container(new ParameterBag(['user' => ['reset_password_role' => 'ROLE_ADMINISTRATOR']]));
+        $container->set('parameter_bag', new ContainerBag($container));
+
+        $checker = $this->createMock(AuthorizationCheckerInterface::class);
+        $checker->method('isGranted')->willReturn($granted);
+        $container->set('security.authorization_checker', $checker);
 
         $router ??= $this->createMock(UrlGeneratorInterface::class);
         $router->method('generate')->willReturnCallback(fn ($route): string => '/' . $route);
@@ -97,10 +107,23 @@ class KmjControllerTest extends TestCase
         $this->assertSame(['Invalid field'], $errors);
     }
 
+    public function testResetPasswordDeniedWithoutConfiguredRole(): void
+    {
+        $repo = $this->createMock(KmjUserRepoInterface::class);
+        $repo->expects($this->never())->method('findOneByIdentityNumber');
+
+        $controller = new KmjController($this->createMock(RoutingConfigurationFactoryInterface::class));
+        $controller->setContainer($this->createContainer(granted: false));
+
+        $this->expectException(AccessDeniedException::class);
+        $controller->resetPassword(new Request(), $repo, 'id-10');
+    }
+
     public function testResetPasswordUserNotFound(): void
     {
         $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
         $controller = new KmjController($routing);
+        $controller->setContainer($this->createContainer());
 
         $repo = $this->createMock(KmjUserRepoInterface::class);
         $repo->method('findOneByIdentityNumber')->with('unknown_id')->willReturn(null);

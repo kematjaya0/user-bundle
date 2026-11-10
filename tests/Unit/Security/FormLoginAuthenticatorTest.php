@@ -5,6 +5,7 @@ namespace Kematjaya\UserBundle\Tests\Unit\Security;
 use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Security\FormLoginAuthenticator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormErrorIterator;
@@ -108,6 +109,38 @@ class FormLoginAuthenticatorTest extends TestCase
         $req4 = Request::create('/login?grant_type=code&client_id=123', 'POST');
         $resp4 = $auth->onAuthenticationSuccess($req4, $token, 'main');
         $this->assertSame('http://localhost/sso', $resp4->getTargetUrl());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function redirectCookieProvider(): iterable
+    {
+        yield 'path di situs ini' => ['/admin/item.html', '/admin/item.html'];
+        yield 'url lengkap host sama' => ['http://localhost/admin/item.html', 'http://localhost/admin/item.html'];
+        yield 'situs lain' => ['https://evil.example/login', '/admin/home.html'];
+        yield 'tanpa skema' => ['//evil.example/login', '/admin/home.html'];
+        yield 'garis miring terbalik' => ['/\\evil.example/login', '/admin/home.html'];
+        yield 'skema javascript' => ['javascript:alert(1)', '/admin/home.html'];
+        yield 'host mirip' => ['http://localhost.evil.example/', '/admin/home.html'];
+    }
+
+    #[DataProvider('redirectCookieProvider')]
+    public function testRedirectCookieOnlyFollowedWhenItStaysOnThisSite(string $cookie, string $expected): void
+    {
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $routing->method('getLoginSuccessRedirectPath')->willReturn('admin_home');
+        $urlGen = $this->createMock(UrlGeneratorInterface::class);
+        $urlGen->method('generate')->with('admin_home')->willReturn('/admin/home.html');
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getRoleNames')->willReturn(['ROLE_USER']);
+
+        $request = Request::create('http://localhost/login', 'POST', [], ['redirect_path' => $cookie]);
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $response = $this->createAuthenticator(urlGen: $urlGen, routing: $routing)->onAuthenticationSuccess($request, $token, 'main');
+
+        $this->assertSame($expected, $response->getTargetUrl());
     }
 
     public function testStartRedirectsToBundleLoginRouteAsRelativePath(): void

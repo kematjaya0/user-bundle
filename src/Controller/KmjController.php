@@ -45,6 +45,8 @@ class KmjController extends AbstractKmjController
      */
     public function resetPassword(Request $request, KmjUserRepoInterface $repo, string $identityNumber): Response
     {
+        $this->denyAccessUnlessGranted($this->getParameter('user')['reset_password_role']);
+
         $user = $repo->findOneByIdentityNumber($identityNumber);
         if (!$user) {
             throw new UserNotFoundException($identityNumber);

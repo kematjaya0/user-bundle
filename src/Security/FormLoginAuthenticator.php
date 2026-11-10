@@ -118,8 +118,9 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        if ($request->cookies->has(self::REDIRECT_PATH_COOKIE)) {
-            $response = new RedirectResponse((string) $request->cookies->get(self::REDIRECT_PATH_COOKIE));
+        $cookiePath = (string) $request->cookies->get(self::REDIRECT_PATH_COOKIE, '');
+        if ($this->isSameSitePath($request, $cookiePath)) {
+            $response = new RedirectResponse($cookiePath);
             $response->headers->clearCookie(self::REDIRECT_PATH_COOKIE);
 
             return $response;
@@ -138,6 +139,29 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return new RedirectResponse(
             $this->getLoginUrl($request),
         );
+    }
+
+    /**
+     * The redirect_path cookie can be set by anyone, so only paths or URLs that stay
+     * on this host are followed; anything else falls back to the configured page.
+     */
+    private function isSameSitePath(Request $request, string $path): bool
+    {
+        if ('' === $path || str_contains($path, '\\') || 1 === preg_match('/[\x00-\x1F]/', $path)) {
+            return false;
+        }
+
+        if (str_starts_with($path, '/')) {
+            return !str_starts_with($path, '//');
+        }
+
+        $parts = parse_url($path);
+        if (false === $parts || !isset($parts['scheme'], $parts['host'])) {
+            return false;
+        }
+
+        return \in_array(strtolower($parts['scheme']), ['http', 'https'], true)
+            && strtolower($parts['host']) === strtolower($request->getHost());
     }
 
     private function getCredentials(Request $request): array
