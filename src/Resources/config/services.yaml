@@ -23,18 +23,16 @@ services:
         tags: 
             - doctrine.repository_service
             
-    Kematjaya\UserBundle\Security\KmjLoginAuthenticator:
-        class: Kematjaya\UserBundle\Security\KmjLoginAuthenticator
-        
+    # AbstractController is a service subscriber: autowiring injects its service
+    # locator, so the full container must not be passed with setContainer()
+    # (getUser() would fail with "The SecurityBundle is not registered").
     Kematjaya\UserBundle\Controller\KmjSecurityController:
-        class: Kematjaya\UserBundle\Controller\KmjSecurityController
-        calls: 
-            - setContainer: ['@service_container']
-            
+        public: true
+        tags: ['controller.service_arguments']
+
     Kematjaya\UserBundle\Controller\KmjController:
-        class: Kematjaya\UserBundle\Controller\KmjController
-        calls: 
-            - setContainer: ['@service_container']
+        public: true
+        tags: ['controller.service_arguments']
         
     Kematjaya\UserBundle\Form\ChangePasswordType:
         class: Kematjaya\UserBundle\Form\ChangePasswordType
