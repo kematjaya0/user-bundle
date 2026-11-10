@@ -437,4 +437,73 @@ class KmjControllerTest extends TestCase
         $this->assertNull($res);
         $this->assertTrue($session->getFlashBag()->has('error'));
     }
+
+    public function testProcessFormReturnsNullWhenNotSubmitted(): void
+    {
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $controller = new class ($routing) extends AbstractKmjController {
+            public function exposeProcess(Request $req, FormInterface $form): mixed { return $this->processForm($req, $form); }
+        };
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(false);
+
+        self::assertNull($controller->exposeProcess(new Request(), $form));
+    }
+
+    public function testNestedFormErrorsAreCollected(): void
+    {
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $controller = new class ($routing) extends AbstractKmjController {
+            public function exposeErrors(FormInterface $form): array { return $this->getErrorsFromForm($form); }
+        };
+        $parent = $this->createMock(FormInterface::class);
+        $child = $this->createMock(FormInterface::class);
+        $child->method('getName')->willReturn('username');
+        $child->method('getErrors')->willReturn(new FormErrorIterator($child, [new FormError('Taken')]));
+        $child->method('all')->willReturn([]);
+        $parent->method('getErrors')->willReturn(new FormErrorIterator($parent, []));
+        $parent->method('all')->willReturn(['username' => $child]);
+
+        self::assertSame(['username' => 'Taken'], $controller->exposeErrors($parent));
+    }
+
+    public function testBaseControllerSavesObjectInTransaction(): void
+    {
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $controller = new class ($routing) extends AbstractKmjController {
+            public function exposeSave(object $object, EntityManagerInterface $manager): object { return $this->saveObject($object, $manager); }
+            public function exposeRouting(): RoutingConfigurationFactoryInterface { return $this->getRoutingConfiguration(); }
+        };
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('wrapInTransaction')->willReturnCallback(static fn (callable $callback) => $callback($em));
+        $object = new \stdClass();
+        $em->expects($this->once())->method('persist')->with($object);
+
+        self::assertSame($object, $controller->exposeSave($object, $em));
+        self::assertSame($routing, $controller->exposeRouting());
+    }
+
+    public function testProcessFormReportsSaveFailure(): void
+    {
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $controller = new class ($routing) extends AbstractKmjController {
+            public function exposeProcess(Request $request, FormInterface $form): mixed { return $this->processForm($request, $form); }
+            protected function saveObject($object, EntityManagerInterface $manager): object { throw new \RuntimeException('database unavailable'); }
+        };
+        $session = new Session(new MockArraySessionStorage());
+        $controller->setContainer($this->createContainer(session: $session));
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getData')->willReturn(new \stdClass());
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->method('getManager')->willReturn($this->createMock(EntityManagerInterface::class));
+        $controller = new class ($routing, $registry) extends AbstractKmjController {
+            public function exposeProcess(Request $request, FormInterface $form): mixed { return $this->processForm($request, $form); }
+            protected function saveObject($object, EntityManagerInterface $manager): object { throw new \RuntimeException('database unavailable'); }
+        };
+        $controller->setContainer($this->createContainer(session: $session));
+        self::assertNull($controller->exposeProcess(new Request(), $form));
+        self::assertSame(['database unavailable'], $session->getFlashBag()->get('error'));
+    }
 }

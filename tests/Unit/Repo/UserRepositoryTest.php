@@ -114,6 +114,22 @@ class UserRepositoryTest extends TestCase
         $this->assertSame($qb, $resultQb);
     }
 
+    public function testCreateQueryBuilderWithNoTokenReturnsQueryBuilder(): void
+    {
+        $em = $this->createMock(EntityManagerInterface::class);
+        $meta = new ClassMetadata(DefaultUser::class);
+        $em->method('getClassMetadata')->willReturn($meta);
+        $qb = $this->createMock(QueryBuilder::class);
+        $em->method('createQueryBuilder')->willReturn($qb);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $storage = $this->createMock(TokenStorageInterface::class);
+        $storage->method('getToken')->willReturn(null);
+
+        $repo = new UserRepository($this->createMock(RoleHierarchyInterface::class), $storage, $this->createRegistry($em));
+        self::assertSame($qb, $repo->createQueryBuilder('u'));
+    }
+
     public function testKmjUserRepositoryFinders(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);

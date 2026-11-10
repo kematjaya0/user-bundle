@@ -46,7 +46,7 @@
 5. import route, update file config/routes/annotations.yaml
    ```
    kmj_user:
-    resource: '@UserBundle/Resources/config/routing/all.xml'
+    resource: '@UserBundle/Resources/config/routing/all.php'
    ```
 6. create entity
    ```
@@ -57,10 +57,8 @@
    
    class MyUser extends DefaultUser 
    {
-        /**
-        * @ORM\Column(type="string", length=255, nullable=true)
-        */
-        private $email;
+         #[ORM\Column(type: 'string', length: 255, nullable: true)]
+         private ?string $email = null;
 
         public function getEmail(): ?string
         {

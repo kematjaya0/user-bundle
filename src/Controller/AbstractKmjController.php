@@ -66,7 +66,7 @@ class AbstractKmjController extends AbstractController
 
             return $user;
         } catch (Exception $ex) {
-            $this->addFlash("error", $ex->getMessages());
+            $this->addFlash("error", $ex->getMessage());
         }
 
         return null;

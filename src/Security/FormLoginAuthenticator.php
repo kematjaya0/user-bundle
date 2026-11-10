@@ -72,9 +72,6 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $credentials = $this->getCredentials($request);
         $user = $this->userProvider->loadUserByIdentifier($credentials["username"]);
-        if (!$user) {
-            throw new BadCredentialsException("user tidak ditemukan");
-        }
 
         $userBadge = new UserBadge($credentials['username'], fn (): UserInterface => $this->userProvider->loadUserByIdentifier($credentials["username"]));
         $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
@@ -153,10 +150,6 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $errors = [];
         foreach ($form->getErrors(true) as $error) {
-            if (!$error instanceof FormError) {
-
-                continue;
-            }
             $errors[] = sprintf("%s %s", $error->getOrigin() ? $error->getOrigin()->getName() . ': ' : '', $error->getMessage());
         }
 

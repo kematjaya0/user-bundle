@@ -6,7 +6,7 @@
 
 namespace Kematjaya\UserBundle\Entity;
 
-use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @package Kematjaya\UserBundle\Entity
@@ -25,11 +25,7 @@ class ResettingPassword implements ResettingPasswordInterface
 
     public function getId(): mixed
     {
-        if (class_exists(Uuid::class)) {
-            return Uuid::fromDateTime(new \DateTime());
-        }
-
-        return \Symfony\Component\Uid\Uuid::v7();
+        return Uuid::v7();
     }
 
     public function getUser(): KmjUserInterface

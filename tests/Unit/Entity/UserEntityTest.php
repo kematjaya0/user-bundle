@@ -77,4 +77,13 @@ class UserEntityTest extends TestCase
 
         $this->assertNotNull($reset->getId());
     }
+
+    public function testResettingPasswordUsernameSetterIsNoOpForFormCompatibility(): void
+    {
+        $user = new DefaultUser();
+        $reset = new ResettingPassword($user);
+
+        $this->assertNull($reset->setUsername('ignored'));
+        $this->assertNull($reset->getUsername());
+    }
 }

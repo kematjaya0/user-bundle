@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
@@ -56,6 +57,9 @@ class FormLoginAuthenticatorTest extends TestCase
         $httpUtils2->method('checkRequestPath')->willReturn(false);
         $auth2 = $this->createAuthenticator($httpUtils2);
         $this->assertFalse($auth2->supports($otherPath));
+
+        $jsonRequest = Request::create('/login', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json']);
+        $this->assertFalse($auth->supports($jsonRequest));
     }
 
     public function testOnAuthenticationSuccess(): void
@@ -125,6 +129,28 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertSame('john', $passport->getUser()->getUserIdentifier());
     }
 
+    public function testAuthenticateAddsPasswordUpgradeBadge(): void
+    {
+        $user = new DefaultUser();
+        $user->setUsername('john');
+        $provider = $this->createMock(UserProviderInterface::class);
+        $provider->method('loadUserByIdentifier')->willReturn($user);
+        $provider = $this->createMockForIntersectionOfInterfaces([UserProviderInterface::class, PasswordUpgraderInterface::class]);
+        $provider->method('loadUserByIdentifier')->willReturn($user);
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getData')->willReturn(['username' => 'john', 'password' => 'secret']);
+        $factory = $this->createMock(FormFactoryInterface::class);
+        $factory->method('create')->willReturn($form);
+
+        $request = Request::create('/login', 'POST');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $passport = $this->createAuthenticator(null, null, $provider, $factory)->authenticate($request);
+
+        self::assertTrue($passport->hasBadge(\Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge::class));
+    }
+
     public function testAuthenticateUnsubmittedForm(): void
     {
         $form = $this->createMock(FormInterface::class);
@@ -182,6 +208,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $auth->authenticate($request);
     }
 
+
     public function testAuthenticateEmptyUsername(): void
     {
         $form = $this->createMock(FormInterface::class);
@@ -216,4 +243,35 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->expectException(BadCredentialsException::class);
         $auth->authenticate($request);
     }
+
+    public function testAuthenticateRejectsNonStringUsername(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getData')->willReturn(['username' => 123, 'password' => 'secret']);
+        $factory = $this->createMock(FormFactoryInterface::class);
+        $factory->method('create')->willReturn($form);
+
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
+        $request = Request::create('/login', 'POST');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->createAuthenticator(null, null, null, $factory)->authenticate($request);
+    }
+
+    public function testAuthenticateRejectsNonStringPassword(): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getData')->willReturn(['username' => 'john', 'password' => 123]);
+        $factory = $this->createMock(FormFactoryInterface::class);
+        $factory->method('create')->willReturn($form);
+
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\BadRequestHttpException::class);
+        $request = Request::create('/login', 'POST');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+        $this->createAuthenticator(null, null, null, $factory)->authenticate($request);
+    }
+
 }

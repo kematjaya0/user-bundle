@@ -31,6 +31,9 @@ class UserRepository extends KmjUserRepository
     {
         $qb = parent::createQueryBuilder($alias, $indexBy);
         $user = $this->getUser();
+        if (null === $user) {
+            return $qb;
+        }
         if (KmjUserInterface::ROLE_SUPER_USER === $user->getSingleRole()) {
 
             return $qb;

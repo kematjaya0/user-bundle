@@ -19,5 +19,16 @@
         <include>
             <directory suffix=".php">src</directory>
         </include>
+        <exclude>
+            <file>src/Entity/KmjUserInterface.php</file>
+            <file>src/Entity/ClientChangePasswordInterface.php</file>
+            <file>src/Entity/ResettingPasswordInterface.php</file>
+            <file>src/Repo/KmjUserRepoInterface.php</file>
+            <file>src/Subscriber/UserTypeSubscriberInterface.php</file>
+            <file>src/Subscriber/Builder/UserTypeSubscriberBuilderInterface.php</file>
+            <file>src/Config/RoutingConfigurationFactoryInterface.php</file>
+            <file>src/Resources/config/routing/all.php</file>
+            <file>src/Resources/config/routing/user.php</file>
+        </exclude>
     </source>
 </phpunit>

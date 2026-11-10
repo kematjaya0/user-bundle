@@ -134,6 +134,58 @@ class UserTypeSubscriberTest extends TestCase
         $this->assertArrayNotHasKey('ROLE_USER', $roles);
     }
 
+    public function testPostSetDataAddsDefaultUserFieldsAndPasswordForNewUser(): void
+    {
+        $subscriber = new UserTypeSubscriber(
+            $this->createMock(KmjUserRepoInterface::class),
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(PasswordHasherFactoryInterface::class),
+            $this->createMock(RoleHierarchyInterface::class),
+        );
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())->method('remove')->with('roles')->willReturnSelf();
+        $form->expects($this->exactly(5))->method('add')->willReturnSelf();
+        $subscriber->postSetData(new FormEvent($form, new DefaultUser()));
+    }
+
+    public function testPostSubmitIgnoresExistingUser(): void
+    {
+        $user = new DefaultUser();
+        $reflection = new \ReflectionProperty(\Kematjaya\UserBundle\Entity\KmjUser::class, 'id');
+        $reflection->setValue($user, \Symfony\Component\Uid\Uuid::v7());
+        $repo = $this->createMock(KmjUserRepoInterface::class);
+        $repo->expects($this->never())->method('findOneByUsernameAndActive');
+        $subscriber = new UserTypeSubscriber($repo, $this->createMock(TokenStorageInterface::class), $this->createMock(PasswordHasherFactoryInterface::class), $this->createMock(RoleHierarchyInterface::class));
+
+        $subscriber->postSubmit(new FormEvent($this->createMock(FormInterface::class), $user));
+        self::assertSame($user, $user);
+    }
+
+    public function testSupportsUserImplementation(): void
+    {
+        $subscriber = new UserTypeSubscriber($this->createMock(KmjUserRepoInterface::class), $this->createMock(TokenStorageInterface::class), $this->createMock(PasswordHasherFactoryInterface::class), $this->createMock(RoleHierarchyInterface::class));
+
+        self::assertTrue($subscriber->isSupported(DefaultUser::class));
+        self::assertFalse($subscriber->isSupported(\stdClass::class));
+    }
+
+    public function testSubscribedEvents(): void
+    {
+        self::assertSame([
+            \Symfony\Component\Form\FormEvents::POST_SET_DATA => 'postSetData',
+            \Symfony\Component\Form\FormEvents::POST_SUBMIT => 'postSubmit',
+        ], UserTypeSubscriber::getSubscribedEvents());
+    }
+
+    public function testPostSubmitIgnoresUnsupportedData(): void
+    {
+        $subscriber = new UserTypeSubscriber($this->createMock(KmjUserRepoInterface::class), $this->createMock(TokenStorageInterface::class), $this->createMock(PasswordHasherFactoryInterface::class), $this->createMock(RoleHierarchyInterface::class));
+        $event = new FormEvent($this->createMock(FormInterface::class), new \stdClass());
+
+        $subscriber->postSubmit($event);
+        self::assertInstanceOf(\stdClass::class, $event->getData());
+    }
+
     public function testBuilderAndCompilerPass(): void
     {
         $builder = new UserTypeSubscriberBuilder();

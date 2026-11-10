@@ -9,13 +9,8 @@ namespace Kematjaya\UserBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Kematjaya\UserBundle\Repo\UserRepository;
 
-/**
- * @ORM\Table(name="kmj_default_user")
- * @ORM\Entity(repositoryClass=UserRepository::class)
- * @package Kematjaya\UserBundle\Entity
- * @license https://opensource.org/licenses/MIT MIT
- * @author  Nur Hidayatullah <kematjaya0@gmail.com>
- */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: 'kmj_default_user')]
 class DefaultUser extends KmjUser
 {
     public function getUserIdentifier(): string
