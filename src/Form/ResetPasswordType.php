@@ -62,8 +62,6 @@ class ResetPasswordType extends AbstractType
                 $user = $data->getUser();
                 $encoder = $this->encoderFactory->getPasswordHasher($user);
                 $data->setPassword($encoder->hash($user->getPassword()));
-
-                $event->setData($data);
             },
         );
     }

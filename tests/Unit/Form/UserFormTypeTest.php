@@ -14,8 +14,8 @@ use Kematjaya\UserBundle\Form\ResetPasswordType;
 use Kematjaya\UserBundle\Subscriber\Builder\UserTypeSubscriberBuilderInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -122,7 +122,7 @@ class UserFormTypeTest extends TestCase
         $type->buildForm($builder, []);
 
         $form = $this->createMock(FormInterface::class);
-        $event1 = new FormEvent($form, null);
+        $event1 = new PostSubmitEvent($form, null);
         $listener($event1);
 
         $user = new DefaultUser();
@@ -134,12 +134,12 @@ class UserFormTypeTest extends TestCase
         $field->expects($this->once())->method('addError');
         $form->method('get')->with('retype_password')->willReturn($field);
 
-        $event2 = new FormEvent($form, $reset);
+        $event2 = new PostSubmitEvent($form, $reset);
         $listener($event2);
 
         $reset->setRetypePassword('p1');
         $user->setPassword('p1');
-        $event3 = new FormEvent($form, $reset);
+        $event3 = new PostSubmitEvent($form, $reset);
         $listener($event3);
         $this->assertSame('hashed_pwd', $reset->getPassword());
     }
@@ -178,7 +178,7 @@ class UserFormTypeTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $form->method('get')->willReturnMap([['password_old', $fieldOld]]);
 
-        $event1 = new FormEvent($form, $change);
+        $event1 = new PostSubmitEvent($form, $change);
         $listener($event1);
 
         $userHasher2 = $this->createMock(UserPasswordHasherInterface::class);
@@ -202,12 +202,12 @@ class UserFormTypeTest extends TestCase
         $form2 = $this->createMock(FormInterface::class);
         $form2->method('get')->with('password_re_new')->willReturn($fieldReNew);
 
-        $event2 = new FormEvent($form2, $change);
+        $event2 = new PostSubmitEvent($form2, $change);
         $listener2($event2);
 
         $change->setPasswordReNew('new1');
         $form3 = $this->createMock(FormInterface::class);
-        $event3 = new FormEvent($form3, $change);
+        $event3 = new PostSubmitEvent($form3, $change);
         $listener2($event3);
         $this->assertSame('hashed_new', $user->getPassword());
     }

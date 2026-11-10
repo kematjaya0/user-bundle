@@ -10,8 +10,9 @@ use Kematjaya\UserBundle\Subscriber\CompilerPass\UserTypeCompilerPass;
 use Kematjaya\UserBundle\Subscriber\UserTypeSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PostSubmitEvent;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
@@ -53,7 +54,7 @@ class UserTypeSubscriberTest extends TestCase
         $form->expects($this->atLeastOnce())->method('add')->willReturnSelf();
         $form->expects($this->once())->method('remove')->with('roles')->willReturnSelf();
 
-        $event = new FormEvent($form, $user);
+        $event = new PostSetDataEvent($form, $user);
         $subscriber->postSetData($event);
     }
 
@@ -79,7 +80,7 @@ class UserTypeSubscriberTest extends TestCase
         $user->setPassword('plain_password');
 
         $form = $this->createMock(FormInterface::class);
-        $event = new FormEvent($form, $user);
+        $event = new PostSubmitEvent($form, $user);
 
         $subscriber->postSubmit($event);
 
@@ -108,7 +109,7 @@ class UserTypeSubscriberTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $form->method('get')->with('username')->willReturn($field);
 
-        $event = new FormEvent($form, $user);
+        $event = new PostSubmitEvent($form, $user);
         $subscriber->postSubmit($event);
     }
 

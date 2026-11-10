@@ -73,7 +73,6 @@ class ChangePasswordType extends AbstractType
 
                 $encoder = $this->passwordHasherFactory->getPasswordHasher($data->getUser());
                 $data->getUser()->setPassword($encoder->hash($data->getPasswordNew()));
-                $event->setData($data);
             },
         );
     }
