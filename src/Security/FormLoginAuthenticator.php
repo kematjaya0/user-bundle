@@ -2,6 +2,8 @@
 
 namespace Kematjaya\UserBundle\Security;
 
+use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
+use Kematjaya\UserBundle\Entity\KmjUserInterface;
 use Kematjaya\UserBundle\Form\LoginType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -26,6 +28,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 /**
  * @package Kematjaya\UserBundle\Security
@@ -34,14 +37,23 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  */
 class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 {
+    use TargetPathTrait;
+
+    private const REDIRECT_PATH_COOKIE = 'redirect_path';
+
     private array $options;
-    public function __construct(private readonly HttpUtils $httpUtils, private readonly UrlGeneratorInterface $urlGenerator, private readonly UserProviderInterface $userProvider, private readonly FormFactoryInterface $formFactory)
-    {
+    public function __construct(
+        private readonly HttpUtils $httpUtils,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly UserProviderInterface $userProvider,
+        private readonly FormFactoryInterface $formFactory,
+        private readonly RoutingConfigurationFactoryInterface $routingConfigurationFactory,
+    ) {
         $this->options = array_merge([
             'username_parameter' => '_username',
             'password_parameter' => '_password',
             'check_path' => '/login',
-            "login_path" => "app_login",
+            "login_path" => "kmj_user_login",
             'post_only' => true,
             'form_only' => true,
             'enable_csrf' => true,
@@ -50,9 +62,13 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         ], []);
     }
 
+    /**
+     * Route milik bundle ini sendiri, dibangkitkan sebagai path relatif ("/login")
+     * seperti di seri 6.x.
+     */
     protected function getLoginUrl(Request $request): string
     {
-        return $this->httpUtils->generateUri($request, $this->options['login_path']);
+        return $this->urlGenerator->generate($this->options['login_path']);
     }
 
     public function supports(Request $request): bool
@@ -72,6 +88,9 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $credentials = $this->getCredentials($request);
         $user = $this->userProvider->loadUserByIdentifier($credentials["username"]);
+        if ($user instanceof KmjUserInterface && true !== $user->getIsActive()) {
+            throw new BadCredentialsException('user tidak aktif');
+        }
 
         $userBadge = new UserBadge($credentials['username'], fn (): UserInterface => $this->userProvider->loadUserByIdentifier($credentials["username"]));
         $passport = new Passport($userBadge, new PasswordCredentials($credentials['password']), [new RememberMeBadge()]);
@@ -92,8 +111,24 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
             );
         }
 
+        $targetPath = $request->hasSession() ? $this->getTargetPath($request->getSession(), $firewallName) : null;
+        if (null !== $targetPath) {
+            $this->removeTargetPath($request->getSession(), $firewallName);
+
+            return new RedirectResponse($targetPath);
+        }
+
+        if ($request->cookies->has(self::REDIRECT_PATH_COOKIE)) {
+            $response = new RedirectResponse((string) $request->cookies->get(self::REDIRECT_PATH_COOKIE));
+            $response->headers->clearCookie(self::REDIRECT_PATH_COOKIE);
+
+            return $response;
+        }
+
         return new RedirectResponse(
-            $this->httpUtils->generateUri($request, "dashboard_index"),
+            $this->urlGenerator->generate(
+                $this->routingConfigurationFactory->getLoginSuccessRedirectPath($token->getRoleNames()),
+            ),
         );
     }
 

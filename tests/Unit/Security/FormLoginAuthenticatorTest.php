@@ -2,6 +2,7 @@
 
 namespace Kematjaya\UserBundle\Tests\Unit\Security;
 
+use Kematjaya\UserBundle\Config\RoutingConfigurationFactoryInterface;
 use Kematjaya\UserBundle\Entity\DefaultUser;
 use Kematjaya\UserBundle\Security\FormLoginAuthenticator;
 use PHPUnit\Framework\TestCase;
@@ -30,13 +31,15 @@ class FormLoginAuthenticatorTest extends TestCase
         ?UrlGeneratorInterface $urlGen = null,
         ?UserProviderInterface $provider = null,
         ?FormFactoryInterface $formFactory = null,
+        ?RoutingConfigurationFactoryInterface $routing = null,
     ): FormLoginAuthenticator {
         $httpUtils ??= $this->createMock(HttpUtils::class);
         $urlGen ??= $this->createMock(UrlGeneratorInterface::class);
         $provider ??= $this->createMock(UserProviderInterface::class);
         $formFactory ??= $this->createMock(FormFactoryInterface::class);
+        $routing ??= $this->createMock(RoutingConfigurationFactoryInterface::class);
 
-        return new FormLoginAuthenticator($httpUtils, $urlGen, $provider, $formFactory);
+        return new FormLoginAuthenticator($httpUtils, $urlGen, $provider, $formFactory, $routing);
     }
 
     public function testSupports(): void
@@ -64,33 +67,88 @@ class FormLoginAuthenticatorTest extends TestCase
 
     public function testOnAuthenticationSuccess(): void
     {
-        $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->method('generateUri')->with($this->anything(), 'dashboard_index')->willReturn('http://localhost/dashboard');
+        $routing = $this->createMock(RoutingConfigurationFactoryInterface::class);
+        $routing->method('getLoginSuccessRedirectPath')->with(['ROLE_USER'])->willReturn('admin_index');
 
         $urlGen = $this->createMock(UrlGeneratorInterface::class);
-        $urlGen->method('generate')->with('sso_authorize', $this->anything())->willReturn('http://localhost/sso');
+        $urlGen->method('generate')->willReturnCallback(
+            static fn (string $name): string => match ($name) {
+                'admin_index' => '/admin/home.html',
+                'sso_authorize' => 'http://localhost/sso',
+            },
+        );
 
-        $auth = $this->createAuthenticator($httpUtils, $urlGen);
+        $auth = $this->createAuthenticator(null, $urlGen, null, null, $routing);
 
         $token = $this->createMock(TokenInterface::class);
+        $token->method('getRoleNames')->willReturn(['ROLE_USER']);
 
-        // normal login
+        // login biasa: tujuan dari konfigurasi user.route.login_success, bukan route tetap
         $req1 = Request::create('/login', 'POST');
+        $req1->setSession(new Session(new MockArraySessionStorage()));
         $resp1 = $auth->onAuthenticationSuccess($req1, $token, 'main');
-        $this->assertSame('http://localhost/dashboard', $resp1->getTargetUrl());
+        $this->assertSame('/admin/home.html', $resp1->getTargetUrl());
+
+        // halaman yang tadinya diminta sebelum login (disimpan firewall di session)
+        $req2 = Request::create('/login', 'POST');
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security.main.target_path', '/admin/bank.html');
+        $req2->setSession($session);
+        $resp2 = $auth->onAuthenticationSuccess($req2, $token, 'main');
+        $this->assertSame('/admin/bank.html', $resp2->getTargetUrl());
+        $this->assertFalse($session->has('_security.main.target_path'));
+
+        // cookie redirect_path dari UnauthorizedEventListener
+        $req3 = Request::create('/login', 'POST', [], ['redirect_path' => '/admin/item.html']);
+        $req3->setSession(new Session(new MockArraySessionStorage()));
+        $resp3 = $auth->onAuthenticationSuccess($req3, $token, 'main');
+        $this->assertSame('/admin/item.html', $resp3->getTargetUrl());
 
         // SSO login with grant_type & client_id
-        $req2 = Request::create('/login?grant_type=code&client_id=123', 'POST');
-        $resp2 = $auth->onAuthenticationSuccess($req2, $token, 'main');
-        $this->assertSame('http://localhost/sso', $resp2->getTargetUrl());
+        $req4 = Request::create('/login?grant_type=code&client_id=123', 'POST');
+        $resp4 = $auth->onAuthenticationSuccess($req4, $token, 'main');
+        $this->assertSame('http://localhost/sso', $resp4->getTargetUrl());
+    }
+
+    public function testStartRedirectsToBundleLoginRouteAsRelativePath(): void
+    {
+        $urlGen = $this->createMock(UrlGeneratorInterface::class);
+        $urlGen->method('generate')->with('kmj_user_login')->willReturn('/login');
+
+        $resp = $this->createAuthenticator(null, $urlGen)->start(Request::create('/admin/bank.html'));
+
+        $this->assertSame('/login', $resp->getTargetUrl());
+    }
+
+    public function testAuthenticateRejectsInactiveUser(): void
+    {
+        $user = new DefaultUser();
+        $user->setUsername('john');
+        $user->setIsActive(false);
+
+        $provider = $this->createMock(UserProviderInterface::class);
+        $provider->method('loadUserByIdentifier')->with('john')->willReturn($user);
+
+        $form = $this->createMock(FormInterface::class);
+        $form->method('isSubmitted')->willReturn(true);
+        $form->method('isValid')->willReturn(true);
+        $form->method('getData')->willReturn(['username' => 'john', 'password' => 'secret123']);
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $formFactory->method('create')->willReturn($form);
+
+        $request = Request::create('/login', 'POST');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $this->expectException(BadCredentialsException::class);
+        $this->createAuthenticator(null, null, $provider, $formFactory)->authenticate($request);
     }
 
     public function testOnAuthenticationFailure(): void
     {
-        $httpUtils = $this->createMock(HttpUtils::class);
-        $httpUtils->method('generateUri')->with($this->anything(), 'app_login')->willReturn('http://localhost/login');
+        $urlGen = $this->createMock(UrlGeneratorInterface::class);
+        $urlGen->method('generate')->with('kmj_user_login')->willReturn('/login');
 
-        $auth = $this->createAuthenticator($httpUtils);
+        $auth = $this->createAuthenticator(null, $urlGen);
 
         $req = Request::create('/login', 'POST');
         $session = new Session(new MockArraySessionStorage());
@@ -99,7 +157,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $ex = new AuthenticationException('Bad password');
         $resp = $auth->onAuthenticationFailure($req, $ex);
 
-        $this->assertSame('http://localhost/login', $resp->getTargetUrl());
+        $this->assertSame('/login', $resp->getTargetUrl());
         $this->assertSame($ex, $session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
@@ -107,6 +165,7 @@ class FormLoginAuthenticatorTest extends TestCase
     {
         $user = new DefaultUser();
         $user->setUsername('john');
+        $user->setIsActive(true);
 
         $provider = $this->createMock(UserProviderInterface::class);
         $provider->method('loadUserByIdentifier')->with('john')->willReturn($user);
@@ -133,6 +192,7 @@ class FormLoginAuthenticatorTest extends TestCase
     {
         $user = new DefaultUser();
         $user->setUsername('john');
+        $user->setIsActive(true);
         $provider = $this->createMock(UserProviderInterface::class);
         $provider->method('loadUserByIdentifier')->willReturn($user);
         $provider = $this->createMockForIntersectionOfInterfaces([UserProviderInterface::class, PasswordUpgraderInterface::class]);
