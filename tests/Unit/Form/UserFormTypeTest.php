@@ -182,6 +182,9 @@ class UserFormTypeTest extends TestCase
 
         $type->buildForm($builder, []);
 
+        // data bukan ClientChangePasswordInterface: penangan tidak melakukan apa pun
+        $listener(new PostSubmitEvent($this->createMock(FormInterface::class), null));
+
         $user = new DefaultUser();
         $change = new ClientChangePassword($user);
         $change->setPasswordOld('wrong');
