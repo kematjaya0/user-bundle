@@ -68,8 +68,6 @@ class ResettingPassword implements ResettingPasswordInterface
     {
         $this->password = $password;
 
-        $this->user->setPassword($password);
-
         return $this;
     }
 

@@ -121,27 +121,43 @@ class UserFormTypeTest extends TestCase
 
         $type->buildForm($builder, []);
 
+        $fields = [
+            'password' => $this->createMock(FormInterface::class),
+            'retype_password' => $this->createMock(FormInterface::class),
+        ];
+        $fields['password']->expects($this->once())->method('addError');
+        $fields['retype_password']->expects($this->once())->method('addError');
+
         $form = $this->createMock(FormInterface::class);
-        $event1 = new PostSubmitEvent($form, null);
-        $listener($event1);
+        $form->method('get')->willReturnCallback(
+            static fn (string $name): FormInterface => $fields[$name],
+        );
+
+        // data bukan ResettingPassword: penangan tidak melakukan apa pun
+        $listener(new PostSubmitEvent($form, null));
 
         $user = new DefaultUser();
+        $hashLama = 'hash_lama';
+        $user->setPassword($hashLama);
         $reset = new ResettingPassword($user);
+
+        // kata sandi kosong ditolak, kata sandi lama tidak diganti
+        $reset->setPassword('   ');
+        $reset->setRetypePassword('   ');
+        $listener(new PostSubmitEvent($form, $reset));
+        $this->assertSame($hashLama, $user->getPassword());
+
+        // ulangi kata sandi tidak sama: ditolak, kata sandi lama tidak diganti
         $reset->setPassword('p1');
         $reset->setRetypePassword('p2');
+        $listener(new PostSubmitEvent($form, $reset));
+        $this->assertSame($hashLama, $user->getPassword());
 
-        $field = $this->createMock(FormInterface::class);
-        $field->expects($this->once())->method('addError');
-        $form->method('get')->with('retype_password')->willReturn($field);
-
-        $event2 = new PostSubmitEvent($form, $reset);
-        $listener($event2);
-
+        // cocok: hash disimpan ke user, bukan ke objek form
         $reset->setRetypePassword('p1');
-        $user->setPassword('p1');
-        $event3 = new PostSubmitEvent($form, $reset);
-        $listener($event3);
-        $this->assertSame('hashed_pwd', $reset->getPassword());
+        $listener(new PostSubmitEvent($form, $reset));
+        $this->assertSame('hashed_pwd', $user->getPassword());
+        $this->assertSame('p1', $reset->getPassword());
     }
 
     public function testChangePasswordPostSubmitListener(): void
